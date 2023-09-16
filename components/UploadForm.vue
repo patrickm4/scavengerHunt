@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mt-2">
         <label>Table number</label>
         <input type="text"/>
 
