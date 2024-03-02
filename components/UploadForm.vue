@@ -15,8 +15,7 @@
             <input
               v-model="tableNumber"
               id="email"
-              name="email"
-              type="email"
+              type="number"
               autocomplete="email"
               required
               @focus="$event.target.select()"
@@ -64,8 +63,7 @@
             <button
               type="submit"
               class="mt-8 flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              :disabled="true"
-              @click="submit"
+              @click.prevent="submit"
             >
               Submit
             </button>
@@ -91,11 +89,28 @@ export default defineComponent({
   },
   methods: {
     setPhoto(event: Event) {
-      this.photo = event.target.value;
+      const reader = new FileReader();
+
+      reader.readAsDataURL(event.target?.files[0])
+
+      reader.onload = (event) => {
+        this.photo = event.target?.result
+      }
+
     },
-    submit() {
-      //upload photo to aws?
+    async submit() {
+      //upload photo to aws
+      
+      if (this.photo) {
+        const response = await $fetch('/api/aws/s3', {
+          method: 'POST',
+          body: {
+            photo: this.photo
+          }
+        })
+      }
     },
   },
 });
 </script>
+1
