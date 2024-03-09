@@ -23,7 +23,7 @@
 
           <div v-if="photos?.length > 0" class="mt-4">
             <div class="flex thumbnail-container">
-              <img v-for="photo in photos" class="mr-2 photo-thumbnail" :src="photo.fileObj" :alt="photo.name" height="250" width="auto" @click="previewPhotoToInspect = photo"/>
+              <img v-for="photo in photos" class="mr-2 photo-thumbnail" :src="photo.fileb64String" :alt="photo.name" height="250" width="auto" @click="previewPhotoToInspect = photo"/>
             </div>
           </div>
 
@@ -52,11 +52,6 @@ export default defineComponent({
     };
   },
   methods: {
-    async test() {
-      console.log("testttt")
-      // const response = await useFetch('/api/test')
-      // console.log("show response", response.data._value)
-    },
     setPhoto(event: Event) {
       this.photos = []
 
@@ -68,36 +63,27 @@ export default defineComponent({
 
           reader.onload = (e) => {
             this.photos.push({
-              fileObj<object>: e.target?.result,
+              fileb64String: e.target?.result,
               name: file.name,
               type: file.type,
               size: file.size
             })
           }
         }
-
-        // event.target.files.forEach(file => {
-        //   const reader = new FileReader();
-
-        //   reader.readAsDataURL(event.target?.files[0])
-
-        //   reader.onload = (event) => {
-        //     // this.photo = event.target?.result
-        //     console.log("event.target?.result", event.target?.result)
-        //   }
-        // })
       }
     },
     async submit() {      
-      // if (this.photos) {
-      //   const response = await $fetch('/api/aws/s3', {
-      //     method: 'POST',
-      //     body: {
-      //       photo: this.photos
-      //     }
-      //   })
-      //   console.log("s3 response", response)
-      // }
+      if (this.photos) {
+        const response = await $fetch('/api/aws/s3', {
+          method: 'POST',
+          body: {
+            photos: this.photos
+          }
+        })
+        console.log("s3 response", response)
+      } else {
+        console.log("no photo submitted")
+      }
     },
   },
 });

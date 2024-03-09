@@ -1,6 +1,6 @@
 <template>
     <div class="preview-modal">
-        <img :src="photo.fileObj"/>
+        <img :src="photo.fileb64String"/>
         <div class="close" @click="$emit('clearPhotoInspect')"><b>X</b></div>
     </div>
 </template>
