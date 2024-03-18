@@ -1,5 +1,6 @@
 <template>
     <div class="px-10 mt-28">
+      <Alert :show="isSubmitSuccess"/>
       <PreviewModal 
         v-if="previewPhotoToInspect"
         :photo="previewPhotoToInspect"
@@ -49,6 +50,7 @@ export default defineComponent({
       testing: '',
       previewPhotoToInspect: null,
       photos: [],
+      isSubmitSuccess: false,
     };
   },
   methods: {
@@ -81,6 +83,19 @@ export default defineComponent({
           }
         })
         console.log("s3 response", response)
+        const errorUploads = response.filter(res => {
+          return res.status !== 'fulfilled'
+        })
+
+        if (errorUploads && Array.isArray(errorUploads) && errorUploads.length > 0) {
+          // show error alert
+        } else {
+          this.isSubmitSuccess = true
+          this.photos = []
+          setTimeout(() => {
+            this.isSubmitSuccess = false
+          }, 3000)  
+        }
       } else {
         console.log("no photo submitted")
       }
