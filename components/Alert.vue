@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-center w-full alert-box" :class="transitionState">
-        <div class="alert-msg-box flex justify-center items-center text-slate-50">{{ message }}</div>
+        <div class="alert-msg-box flex justify-center items-center text-slate-50" :class="messageBoxStyle">{{ message }}</div>
     </div>
 </template>
 
@@ -9,13 +9,21 @@ export default {
     props: {
         message: {
             type: String,
-            default: 'Success'
+            default: 'No Message'
         },
-        show: Boolean
+        show: Boolean,
+        type: String
     },
     computed: {
         transitionState() {
             return this.show ? 'alert-show' : 'alert-hidden'
+        },
+        messageBoxStyle() {
+            if (this.type) {
+                return this.type.toLowerCase()
+            } else {
+                return 'info'
+            }
         }
     }
 }
@@ -37,7 +45,6 @@ export default {
     margin-top: 0.5rem;
 }
 .alert-msg-box {
-    background-color: #2e844a;
     border-radius: 0.375rem;
     width: 98%;
 }

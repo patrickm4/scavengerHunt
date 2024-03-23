@@ -1,6 +1,6 @@
 <template>
     <div class="px-10 mt-28">
-      <Alert :show="isSubmitSuccess"/>
+      <Alert :show="alert.isShowing" :message="alert.message" :type="alert.type"/>
       <PreviewModal 
         v-if="previewPhotoToInspect"
         :photo="previewPhotoToInspect"
@@ -23,17 +23,18 @@
           />
 
           <div v-if="photos?.length > 0" class="mt-4">
-            <div class="flex thumbnail-container">
+            <div v-if="!isPhotosFinishedLoading" class="w-full info py-3 flex justify-center items-center"> <div class="circle mr-2 animate-spin"></div> loading</div>
+            <div v-else class="flex thumbnail-container">
               <img v-for="photo in photos" class="mr-2 photo-thumbnail" :src="photo.fileb64String" :alt="photo.name" height="250" width="auto" @click="previewPhotoToInspect = photo"/>
             </div>
           </div>
 
           <button
             type="button"
-            class="mt-8 flex w-full justify-center rounded-md bg-yellow-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30"
-            :disabled="photos?.length <= 0"
+            class="mt-8 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30"
             @click="submit"
           >
+            <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div>
                 Submit
           </button>
         </div>
@@ -50,11 +51,35 @@ export default defineComponent({
       testing: '',
       previewPhotoToInspect: null,
       photos: [],
-      isSubmitSuccess: false,
+      alert: {
+        isShowing: false,
+        message: '',
+        type: 'info'
+      },
+      isSubmitting: false,
+      filesLength: 0
     };
   },
+  computed: {
+    isPhotosFinishedLoading() {
+      return this.photos.length === this.filesLength
+    }
+  },
   methods: {
+    showAlert(msg: string, type: string) {
+      this.alert.message = msg
+      this.alert.type = type
+      this.alert.isShowing = true
+      setTimeout(() => {
+        this.alert.isShowing = false
+        setTimeout(() => {
+          this.alert.message = ''
+          this.alert.type = 'info'
+        },100)
+      }, 3000)  
+    },
     setPhoto(event: Event) {
+      this.filesLength = event.target.files.length || 0
       this.photos = []
 
       if ((event.target as HTMLInputElement)?.files) {
@@ -72,32 +97,49 @@ export default defineComponent({
             })
           }
         }
+
       }
     },
-    async submit() {      
-      if (this.photos) {
+    async submit() {
+      if (this.isSubmitting) return
+      if (!this.isPhotosFinishedLoading) return
+
+      this.isSubmitting = true     
+
+      if (this.photos?.length > 0) {
         const response = await $fetch('/api/aws/s3', {
           method: 'POST',
           body: {
             photos: this.photos
           }
         })
-        console.log("s3 response", response)
-        const errorUploads = response.filter(res => {
-          return res.status !== 'fulfilled'
-        })
 
-        if (errorUploads && Array.isArray(errorUploads) && errorUploads.length > 0) {
-          // show error alert
-        } else {
-          this.isSubmitSuccess = true
+        console.log("s3 response", response)
+
+        if (response?.error) {
           this.photos = []
-          setTimeout(() => {
-            this.isSubmitSuccess = false
-          }, 3000)  
+          this.showAlert(`Error uploading photos - error: ${response.error}`, 'danger')
+          this.isSubmitting = false  
+        } else {
+          const errorUploads = response.filter((res: any) => {
+            return res.status !== 'fulfilled'
+          })
+  
+          if (errorUploads && Array.isArray(errorUploads) && errorUploads.length > 0) {
+            this.photos = []
+            this.showAlert(`Error uploading photos`, 'danger')
+            this.isSubmitting = false   
+          } else {
+            const photoCount = this.photos.length
+            this.photos = []
+            this.showAlert(`Successfully uploaded ${photoCount} photo${photoCount > 1 ? 's' : ''}`, 'success')
+            this.isSubmitting = false   
+          }
         }
+
       } else {
-        console.log("no photo submitted")
+        this.showAlert('Please select photos to upload.', 'warning')
+        this.isSubmitting = false   
       }
     },
   },
@@ -113,5 +155,16 @@ export default defineComponent({
 }
 .thumbnail-container {
   overflow-x: auto
+}
+.circle {
+  margin-top: 0.1rem;
+  border-radius: 50%;
+  border: 3px solid;
+  height: 20px;
+  width: 20px;
+  border-bottom-color: #ddd;
+  border-left-color: #ddd;
+  border-right-color: #ddd;
+  border-top-color: #fff;
 }
 </style>

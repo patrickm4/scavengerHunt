@@ -35,10 +35,15 @@ export default defineEventHandler(async (event) => {
 
             return responses
         } catch (err) {
-            console.error(err);
-            return `fail error: ${err}`
+            console.error('s3 photo upload error: ', err);
+            return {
+                error: err
+            }
         }
     } else {
-        return 'error: photos not array'
+        return [{
+            status: 'fail',
+            message: 'No photos submitted, or not array'
+        }]
     }
 })
