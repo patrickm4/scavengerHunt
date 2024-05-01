@@ -14,6 +14,18 @@
         <!-- <UploadForm /> -->
         <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">Wedding at Sage!</h1>
         <p class="mt-6 text-xl leading-8 text-gray-700">Upload photos through out the night here.</p>
+
+
+        <FullNameInput v-model:fullName="fullName"/>
+        <button
+            type="button"
+            class="mt-8 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30"
+            @click="saveName"
+          >
+            Enter
+        </button>
+
+
         <div class="mt-10">
           <input
             type="file"
@@ -57,7 +69,8 @@ export default defineComponent({
         type: 'info'
       },
       isSubmitting: false,
-      filesLength: 0
+      filesLength: 0,
+      fullName: ''
     };
   },
   computed: {
@@ -66,6 +79,9 @@ export default defineComponent({
     }
   },
   methods: {
+    saveName () {
+      localStorage.setItem("name", this.fullName);
+    },
     showAlert(msg: string, type: string) {
       this.alert.message = msg
       this.alert.type = type
