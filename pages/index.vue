@@ -6,24 +6,65 @@
         :photo="previewPhotoToInspect"
         @clearPhotoInspect="previewPhotoToInspect = null"
       />
-        <NuxtLink to="/galleries">Gallery</NuxtLink>
+        <div class="flex justify-between">
+          <NuxtLink to="/galleries">Gallery</NuxtLink>
+          <span>Hi, {{ this.fullName }}</span>
+        </div>
         <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">Welcome to Dorothy and Patrick's</p>
         <!-- <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Scavenger Hunt!</h1> -->
         <!-- <p class="mt-6 text-xl leading-8 text-gray-700">Take a table selfie with each item or person then upload it here.</p> -->
         <!-- <button @click="test" class="mt-6 block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">test</button> -->
         <!-- <UploadForm /> -->
+
         <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">Wedding at Sage!</h1>
         <p class="mt-6 text-xl leading-8 text-gray-700">Upload photos through out the night here.</p>
 
+        <template v-if="doesNeedsName">
+          <FullNameInput v-model:fullName="fullName"/>
+          <button
+              type="button"
+              class="mt-8 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30"
+              @click="saveName"
+            >
+              Enter
+          </button>
+        </template>
 
-        <FullNameInput v-model:fullName="fullName"/>
-        <button
-            type="button"
-            class="mt-8 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30"
-            @click="saveName"
+
+        <div class="mt-2">
+          <label
+            for="email"
+            class="block text-sm font-medium leading-6 text-gray-900 mb-2"
+            >Upload photos of:</label
           >
-            Enter
-        </button>
+          <ul>
+            <!-- <li v-for="item in huntItems" class="relative flex gap-x-3">
+              <div class="flex h-6 items-center">
+                <input
+                  id="comments"
+                  name="comments"
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                  v-model="objectives"
+                  :value="item"
+                />
+              </div>
+              {{ item }}
+            </li> -->
+            <li v-for="item in huntItems" class="relative flex gap-x-3">
+              <div class="flex h-6 items-center">
+                <input
+                  :id="item"
+                  type="radio"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                  v-model="task"
+                  :value="item"
+                />
+              </div>
+              {{ item }}
+            </li>
+          </ul>
+        </div>
 
 
         <div class="mt-10">
@@ -70,8 +111,20 @@ export default defineComponent({
       },
       isSubmitting: false,
       filesLength: 0,
-      fullName: ''
+      fullName: '',
+      doesNeedsName: false,
+      huntItems: ["Something blue", "Someone with tattoos"],
+      objectives: [],
+      task: ''
     };
+  },
+  mounted() {
+    const name = localStorage.getItem("name")
+    if (name) {
+      this.fullName = name
+    } else {
+      this.doesNeedsName = true
+    }
   },
   computed: {
     isPhotosFinishedLoading() {
@@ -119,14 +172,22 @@ export default defineComponent({
     async submit() {
       if (this.isSubmitting) return
       if (!this.isPhotosFinishedLoading) return
+      if (!this.task) {
+        this.showAlert(`Please choose which category your photo is in!`, 'danger')
+        return
+      }
 
-      this.isSubmitting = true     
+      this.isSubmitting = true 
+      
+      console.log("name", this.fullName)
 
       if (this.photos?.length > 0) {
         const response = await $fetch('/api/aws/s3', {
           method: 'POST',
           body: {
-            photos: this.photos
+            photos: this.photos,
+            name: this.fullName,
+            task: this.task
           }
         })
 

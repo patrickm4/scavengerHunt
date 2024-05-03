@@ -17,14 +17,21 @@ export default defineEventHandler(async (event) => {
 
     // return { body }
 
-    if (body?.photos && Array.isArray(body.photos)) {
+    //str;
+
+    console.log("body name", body.name, body.name.replace(/\s/g, '-'))
+
+    if (body?.photos && Array.isArray(body.photos) && body.name && body.task) {
+        const name = body.name.replace(/\s/g, '-')
+        const task = body.task.toLowerCase().replace(/\s/g, '-')
+
         try {
             const responses = await Promise.allSettled(body.photos.map((photo: Photo) => {
                 const buf = Buffer.from(photo.fileb64String.replace(/^data:image\/\w+;base64,/, ""), 'base64')
 
                 const command = new PutObjectCommand({
                     Bucket: "dopat-scavenger-hunt",
-                    Key: `table-1/${photo.name}`,
+                    Key: `${task}/${name}/${photo.name}`,
                     Body: buf,
                     ContentEncoding: 'base64',
                     ContentType: 'image/jpeg'
