@@ -31,6 +31,8 @@ export default defineEventHandler(async (event) => {
 
     } catch (err) {
         console.error(err);
-        return `fail error: ${err}`
+        return {
+            error: err
+        }
     }
 })
