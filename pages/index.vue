@@ -8,7 +8,7 @@
       />
         <div class="flex justify-between">
           <NuxtLink to="/galleries">Gallery</NuxtLink>
-          <span>Hi, {{ this.fullName }}</span>
+          <span v-if="!doesNeedsName && fullName">Hi, {{ fullName }}</span>
         </div>
         <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">Welcome to Dorothy and Patrick's</p>
         <!-- <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Scavenger Hunt!</h1> -->
@@ -30,67 +30,55 @@
           </button>
         </template>
 
-
-        <div class="mt-2">
-          <label
-            for="email"
-            class="block text-sm font-medium leading-6 text-gray-900 mb-2"
-            >Upload photos of:</label
-          >
-          <ul>
-            <!-- <li v-for="item in huntItems" class="relative flex gap-x-3">
-              <div class="flex h-6 items-center">
-                <input
-                  id="comments"
-                  name="comments"
-                  type="checkbox"
-                  class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                  v-model="objectives"
-                  :value="item"
-                />
-              </div>
-              {{ item }}
-            </li> -->
-            <li v-for="item in huntItems" class="relative flex gap-x-3">
-              <div class="flex h-6 items-center">
-                <input
-                  :id="item"
-                  type="radio"
-                  class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                  v-model="task"
-                  :value="item"
-                />
-              </div>
-              {{ item }}
-            </li>
-          </ul>
-        </div>
-
-
-        <div class="mt-10">
-          <input
-            type="file"
-            class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
-            multiple
-            @change="setPhoto($event)"
-          />
-
-          <div v-if="photos?.length > 0" class="mt-4">
-            <div v-if="!isPhotosFinishedLoading" class="w-full info py-3 flex justify-center items-center"> <div class="circle mr-2 animate-spin"></div> loading</div>
-            <div v-else class="flex thumbnail-container">
-              <img v-for="photo in photos" class="mr-2 photo-thumbnail" :src="photo.fileb64String" :alt="photo.name" height="250" width="auto" @click="previewPhotoToInspect = photo"/>
-            </div>
+        <template v-else-if="!doesNeedsName && fullName">
+          <div class="mt-2">
+            <label
+              for="email"
+              class="block text-sm font-medium leading-6 text-gray-900 mb-2"
+              >Upload photos of:</label
+            >
+            <ul>
+              <li v-for="item in huntItems" class="relative flex gap-x-3">
+                <div class="flex h-6 items-center">
+                  <input
+                    :id="item"
+                    type="radio"
+                    class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                    v-model="task"
+                    :value="item"
+                  />
+                </div>
+                {{ item }}
+              </li>
+            </ul>
           </div>
 
-          <button
-            type="button"
-            class="mt-8 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30"
-            @click="submit"
-          >
-            <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div>
-                Submit
-          </button>
-        </div>
+
+          <div class="mt-10">
+            <input
+              type="file"
+              class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
+              multiple
+              @change="setPhoto($event)"
+            />
+
+            <div v-if="photos?.length > 0" class="mt-4">
+              <div v-if="!isPhotosFinishedLoading" class="w-full info py-3 flex justify-center items-center"> <div class="circle mr-2 animate-spin"></div> loading</div>
+              <div v-else class="flex thumbnail-container">
+                <img v-for="photo in photos" class="mr-2 photo-thumbnail" :src="photo.fileb64String" :alt="photo.name" height="250" width="auto" @click="previewPhotoToInspect = photo"/>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="mt-8 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30"
+              @click="submit"
+            >
+              <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div>
+                  Submit
+            </button>
+          </div>
+        </template>
     </div>
 </template>
 
@@ -134,6 +122,7 @@ export default defineComponent({
   methods: {
     saveName () {
       localStorage.setItem("name", this.fullName);
+      this.doesNeedsName = false
     },
     showAlert(msg: string, type: string) {
       this.alert.message = msg
