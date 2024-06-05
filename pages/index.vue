@@ -1,5 +1,5 @@
 <template>
-    <div class="px-10 mt-28">
+    <div class="px-10 mt-8">
       <Alert :show="alert.isShowing" :message="alert.message" :type="alert.type"/>
       <PreviewModal 
         v-if="previewPhotoToInspect"
