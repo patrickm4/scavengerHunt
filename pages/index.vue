@@ -102,7 +102,7 @@ export default defineComponent({
       filesLength: 0,
       fullName: '',
       doesNeedsName: false,
-      huntItems: ["you the bridge and groom", "you and the flower girl or the ring bearer", "you and the sinking boat", "the newly weds kiss", "you in the rose garden", "you and a new friend", "a selfie with your table", "a toast/cheers", "you busting out a move on the dance floor", "you singing karaoke", "something sweet", "a LIT moment"],
+      huntItems: ["you the bride and groom", "you and the flower girl or the ring bearer", "you and the sinking boat", "the newly weds kiss", "you in the rose garden", "you and a new friend", "a selfie with your table", "a toast/cheers", "you busting out a move on the dance floor", "you singing karaoke", "something sweet", "a LIT moment"],
       objectives: [],
       task: ''
     };
