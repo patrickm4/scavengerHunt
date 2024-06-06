@@ -1,17 +1,19 @@
 <template>
-  <Alert :show="alert.isShowing" :message="alert.message" :type="alert.type"/>
-  <div @click="$router.go(-1)">Back</div>
-  <section>
-    <p>See all photos from the wedding!</p>
-  </section>
-  <div>Show photos here</div>
-  <div v-if="photos?.length > 0">
-    <img 
-      v-for="img in photos" 
-      :src="img"
-    />
+  <div div class="px-10 mt-8">
+    <Alert :show="alert.isShowing" :message="alert.message" :type="alert.type"/>
+    <div @click="$router.go(-1)">Back</div>
+    <section>
+      <p>See all photos from the wedding!</p>
+    </section>
+    <div>Show photos here</div>
+    <div v-if="photos?.length > 0">
+      <img 
+        v-for="img in photos" 
+        :src="img"
+      />
+    </div>
+    <button @click="getPhotos">Get Photos</button>
   </div>
-  <button @click="getPhotos">Get Photos</button>
 </template>
 
 <script lang="ts">
