@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-center w-full alert-box" :class="transitionState">
-        <div class="alert-msg-box flex justify-center items-center text-slate-50" :class="messageBoxStyle">{{ message }}</div>
+        <div class="alert-msg-box flex justify-center items-center text-slate-50 fixed py-4" :class="messageBoxStyle">{{ message }}</div>
     </div>
 </template>
 

@@ -72,7 +72,7 @@
 
             <button
               type="button"
-              class="mt-8 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30"
+              class="mt-8 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
               @click="submit"
             >
               <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div>
@@ -135,7 +135,7 @@ export default defineComponent({
           this.alert.message = ''
           this.alert.type = 'info'
         },100)
-      }, 3000)  
+      }, 5000)  
     },
     setPhoto(event: Event) {
       this.filesLength = event.target.files.length || 0
@@ -187,22 +187,24 @@ export default defineComponent({
           this.photos = []
           this.showAlert(`Error uploading photos - error: ${response.error}`, 'danger')
           this.isSubmitting = false  
-        } else {
-          const errorUploads = response.filter((res: any) => {
-            return res.status !== 'fulfilled'
-          })
-  
-          if (errorUploads && Array.isArray(errorUploads) && errorUploads.length > 0) {
-            this.photos = []
-            this.showAlert(`Error uploading photos`, 'danger')
-            this.isSubmitting = false   
-          } else {
-            const photoCount = this.photos.length
-            this.photos = []
-            this.showAlert(`Successfully uploaded ${photoCount} photo${photoCount > 1 ? 's' : ''}`, 'success')
-            this.isSubmitting = false   
-          }
+          return
         }
+
+        const errorUploads = response.filter((res: any) => {
+          return res.status !== 'fulfilled'
+        })
+
+        if (errorUploads && Array.isArray(errorUploads) && errorUploads.length > 0) {
+          this.photos = []
+          this.showAlert(`Error uploading photos`, 'danger')
+          this.isSubmitting = false   
+        } else {
+          const photoCount = this.photos.length
+          this.photos = []
+          this.showAlert(`Successfully uploaded ${photoCount} photo${photoCount > 1 ? 's' : ''}`, 'success')
+          this.isSubmitting = false   
+        }
+      
 
       } else {
         this.showAlert('Please select photos to upload.', 'warning')

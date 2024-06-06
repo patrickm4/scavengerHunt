@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
 
     //str;
 
-    console.log("body name", body.name, body.name.replace(/\s/g, '-'))
+    // console.log("body name", body.name, body.name.replace(/\s/g, '-'))
 
     if (body?.photos && Array.isArray(body.photos) && body.name && body.task) {
         const name = body.name.replace(/\s/g, '-')
