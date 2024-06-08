@@ -185,7 +185,7 @@ export default defineComponent({
 
         if (response?.error) {
           this.photos = []
-          this.showAlert(`Error uploading photos - error: ${response.error}`, 'danger')
+          this.showAlert(`Error uploading photos - error1: ${response.error}`, 'danger')
           this.isSubmitting = false  
           return
         }
@@ -196,7 +196,7 @@ export default defineComponent({
 
         if (errorUploads && Array.isArray(errorUploads) && errorUploads.length > 0) {
           this.photos = []
-          this.showAlert(`Error uploading photos`, 'danger')
+          this.showAlert(`Error uploading photos - error2: ${response}`, 'danger')
           this.isSubmitting = false   
         } else {
           const photoCount = this.photos.length
