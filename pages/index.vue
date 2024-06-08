@@ -78,6 +78,10 @@
               <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div>
                   Submit
             </button>
+
+            <div>
+              {{ seeResponse }}
+            </div>
           </div>
         </template>
     </div>
@@ -98,6 +102,7 @@ export default defineComponent({
         message: '',
         type: 'info'
       },
+      seeResponse: '',
       isSubmitting: false,
       filesLength: 0,
       fullName: '',
@@ -196,7 +201,10 @@ export default defineComponent({
 
         if (errorUploads && Array.isArray(errorUploads) && errorUploads.length > 0) {
           this.photos = []
-          this.showAlert(`Error uploading photos - error2: ${response.stringify()}`, 'danger')
+          this.showAlert(`Error uploading photos - error2`, 'danger')
+
+          this.seeResponse = JSON.stringify(response)
+
           this.isSubmitting = false   
         } else {
           const photoCount = this.photos.length
