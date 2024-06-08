@@ -196,7 +196,7 @@ export default defineComponent({
 
         if (errorUploads && Array.isArray(errorUploads) && errorUploads.length > 0) {
           this.photos = []
-          this.showAlert(`Error uploading photos - error2: ${response}`, 'danger')
+          this.showAlert(`Error uploading photos - error2: ${response.stringify()}`, 'danger')
           this.isSubmitting = false   
         } else {
           const photoCount = this.photos.length
