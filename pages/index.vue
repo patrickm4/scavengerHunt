@@ -217,8 +217,6 @@ export default defineComponent({
 
       this.isSubmitting = true;
 
-      console.log("name", this.fullName);
-
       if (this.photos?.length > 0) {
         const response = await $fetch("/api/aws/s3", {
           method: "POST",
