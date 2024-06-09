@@ -10,7 +10,7 @@ interface Photo {
     size: number;
 }
 
-const s3Client = new S3Client({});
+const s3Client = new S3Client({region: 'us-west-2'});
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
