@@ -118,6 +118,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
+const array_of_allowed_file_types = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/gif",
+];
+
 export default defineComponent({
   // type inference enabled
   data() {
@@ -171,7 +178,7 @@ export default defineComponent({
       localStorage.setItem("name", this.fullName);
       this.doesNeedsName = false;
     },
-    showAlert(msg: string, type: string) {
+    showAlert(msg: string, type: string, duration: number) {
       this.alert.message = msg;
       this.alert.type = type;
       this.alert.isShowing = true;
@@ -181,7 +188,7 @@ export default defineComponent({
           this.alert.message = "";
           this.alert.type = "info";
         }, 100);
-      }, 5000);
+      }, duration || 5000);
     },
     setPhoto(event: Event) {
       this.filesLength = event.target.files.length || 0;
@@ -189,6 +196,11 @@ export default defineComponent({
 
       if ((event.target as HTMLInputElement)?.files) {
         for (const file of (event.target as HTMLInputElement)?.files) {
+          if (!array_of_allowed_file_types.includes(file.type)) {
+            this.showAlert("That file is not an image", "warning", 3000);
+            this.photos = [];
+          }
+
           const reader = new FileReader();
 
           reader.readAsDataURL(file);
@@ -237,33 +249,6 @@ export default defineComponent({
           );
           this.isSubmitting = false;
           return;
-        }
-
-        const errorUploads = response.filter((res: any) => {
-          return res.status !== "fulfilled";
-        });
-
-        if (
-          errorUploads &&
-          Array.isArray(errorUploads) &&
-          errorUploads.length > 0
-        ) {
-          this.photos = [];
-          this.showAlert(`Error uploading photos - error2`, "danger");
-
-          this.seeResponse = JSON.stringify(response);
-
-          this.isSubmitting = false;
-        } else {
-          const photoCount = this.photos.length;
-          this.photos = [];
-          this.showAlert(
-            `Successfully uploaded ${photoCount} photo${
-              photoCount > 1 ? "s" : ""
-            }`,
-            "success"
-          );
-          this.isSubmitting = false;
         }
 
         const errorUploads = response.filter((res: any) => {
