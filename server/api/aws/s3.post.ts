@@ -10,7 +10,7 @@ interface Photo {
     size: number;
 }
 
-const s3Client = new S3Client({});
+const s3Client = new S3Client({region: 'us-west-2'});
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
 
     //str;
 
-    console.log("body name", body.name, body.name.replace(/\s/g, '-'))
+    // console.log("body name", body.name, body.name.replace(/\s/g, '-'))
 
     if (body?.photos && Array.isArray(body.photos) && body.name && body.task) {
         const name = body.name.replace(/\s/g, '-')

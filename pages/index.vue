@@ -267,6 +267,33 @@ export default defineComponent({
           );
           this.isSubmitting = false;
         }
+
+        const errorUploads = response.filter((res: any) => {
+          return res.status !== "fulfilled";
+        });
+
+        if (
+          errorUploads &&
+          Array.isArray(errorUploads) &&
+          errorUploads.length > 0
+        ) {
+          this.photos = [];
+          this.showAlert(`Error uploading photos - error2`, "danger");
+
+          this.seeResponse = JSON.stringify(response);
+
+          this.isSubmitting = false;
+        } else {
+          const photoCount = this.photos.length;
+          this.photos = [];
+          this.showAlert(
+            `Successfully uploaded ${photoCount} photo${
+              photoCount > 1 ? "s" : ""
+            }`,
+            "success"
+          );
+          this.isSubmitting = false;
+        }
       } else {
         this.showAlert("Please select photos to upload.", "warning");
         this.isSubmitting = false;
