@@ -160,10 +160,16 @@ export default defineComponent({
       task: "",
     };
   },
-  mounted() {
+  async mounted() {
     const name = localStorage.getItem("name");
     if (name) {
       this.fullName = name;
+      // fetch their checklist
+      const response = await $fetch(`/api/aws/user/s3?name=${encodeURIComponent(name)}`, {
+          method: "GET"
+        });
+
+      console.log("getName json check", response, JSON.parse(response))
     } else {
       this.doesNeedsName = true;
     }
@@ -174,9 +180,18 @@ export default defineComponent({
     },
   },
   methods: {
-    saveName() {
+    async saveName() {
       localStorage.setItem("name", this.fullName);
       this.doesNeedsName = false;
+      // create a JSON for them under name/checklist
+      const response = await $fetch("/api/aws/user/s3", {
+          method: "POST",
+          body: {
+            name: this.fullName,
+          },
+        });
+
+      console.log("saveName check", response)
     },
     showAlert(msg: string, type: string, duration: number) {
       this.alert.message = msg;
