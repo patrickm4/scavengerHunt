@@ -142,6 +142,7 @@ export default defineComponent({
       filesLength: 0,
       fullName: "",
       doesNeedsName: false,
+      completedItems: [],
       huntItems: [
         "you the bride and groom",
         "you and the flower girl or the ring bearer",
@@ -170,6 +171,7 @@ export default defineComponent({
         });
 
       console.log("getName json check", response, JSON.parse(response))
+      // this.completedItems = JSON.parse(response).completedTasks
     } else {
       this.doesNeedsName = true;
     }
@@ -251,6 +253,7 @@ export default defineComponent({
             photos: this.photos,
             name: this.fullName,
             task: this.task,
+            completedTasks: this.completedItems,
           },
         });
 
