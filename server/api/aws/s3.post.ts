@@ -18,10 +18,6 @@ const allowed_file_size = 100;//mb
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
-    // return { body }
-
-    //str;
-
     console.log("body name", body.name, body.name.replace(/\s/g, '-'))
 
     if (body?.photos && Array.isArray(body.photos) && body.name && body.task) {
@@ -30,14 +26,26 @@ export default defineEventHandler(async (event) => {
         const completedTasks = body.completedTasks
 
         try {
-            const updateUserJsonCommand = new PutObjectCommand({
-                Bucket: "dopat-scavenger-hunt",
-                Key: `${name}/checklist.json`,
-                Body: JSON.stringify({
-                    completedTasks: [...completedTasks, task],
-                }),
-                ContentType: "application/json"
-            })
+            // let jsonUpdates = []
+            let jsonUpdates: object[] = []
+            const updateUserJson = (photoName: any) => {
+                // maybe we make a object version of the completed tasks
+                // { task: `${task}/${name}/${photo.name}` }
+                // this way we can also get the correct picture per person
+                const updateUserJsonCommand = new PutObjectCommand({
+                    Bucket: "dopat-scavenger-hunt",
+                    Key: `${name}/checklist.json`,
+                    Body: JSON.stringify({
+                        completedTasks: {
+                            ...completedTasks,
+                            [task]: `${task}/${name}/${photoName}`
+                        },
+                    }),
+                    ContentType: "application/json"
+                })
+
+                jsonUpdates.push(s3Client.send(updateUserJsonCommand))
+            }
 
             const responses = await Promise.allSettled([...body.photos.map((photo: Photo) => {
 
@@ -64,8 +72,10 @@ export default defineEventHandler(async (event) => {
                     ContentType: 'image/jpeg'
                 });
 
+                updateUserJson(photo.name)
+
                 return s3Client.send(command)
-            }), s3Client.send(updateUserJsonCommand)])
+            }), ...jsonUpdates])
 
             return responses
         } catch (err) {

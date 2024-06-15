@@ -76,7 +76,7 @@
         <input
           type="file"
           class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
-          multiple
+          :multiple=" selectedTask ? null : true "
           @change="setPhoto($event)"
         />
 
@@ -147,6 +147,7 @@ export default defineComponent({
       fullName: "",
       doesNeedsName: false,
       completedItems: [],
+      completedItemsObj: null,
       huntItems: [
         "you the bride and groom",
         "you and the flower girl or the ring bearer",
@@ -154,12 +155,12 @@ export default defineComponent({
         "the newly weds kiss",
         "you in the rose garden",
         "you and a new friend",
-        "a selfie with your table",
-        "a toast/cheers",
+        "you and your table",
+        "a toast or cheers",
         "you busting out a move on the dance floor",
-        "you singing karaoke",
+        "you and someone related to the bride or groom",
         "something sweet",
-        "a LIT moment",
+        "a lit moment",
       ],
       objectives: [],
       selectedTask: "",
@@ -176,7 +177,8 @@ export default defineComponent({
 
       console.log("getName json check", response, JSON.parse(response))
 
-      this.completedItems = JSON.parse(response).completedTasks.map((task: string) => task.replace(/-/g, " "))
+      this.completedItems = Object.keys(JSON.parse(response).completedTasks).map((task: string) => task.replace(/-/g, " "))
+      this.completedItemsObj = JSON.parse(response).completedTasks
     } else {
       this.doesNeedsName = true;
     }
@@ -269,7 +271,7 @@ export default defineComponent({
             photos: this.photos,
             name: this.fullName,
             task: this.selectedTask,
-            completedTasks: this.completedItems,
+            completedTasks: this.completedItemsObj,
           },
         });
 

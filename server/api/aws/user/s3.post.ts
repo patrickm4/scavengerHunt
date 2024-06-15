@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
         Bucket: "dopat-scavenger-hunt",
         Key: `${body.name.replace(/\s/g, '-')}/checklist.json`,
         Body: JSON.stringify({
-            completedTasks: [],
+            completedTasks: {},
         }),
         ContentType: "application/json"
     });

@@ -18,7 +18,6 @@ export default defineEventHandler(async (event) => {
         const response = await s3Client.send(command);
         // The Body object also has 'transformToByteArray' and 'transformToWebStream' methods.
         const str = await response.Body.transformToString();
-        console.log(str);
         return str
     } catch (err) {
         console.error(err);
@@ -26,7 +25,5 @@ export default defineEventHandler(async (event) => {
             error: err
         }
     }
-
-    // return 'ENDD'
 
 })
