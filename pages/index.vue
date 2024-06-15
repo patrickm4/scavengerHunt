@@ -48,22 +48,25 @@
           >Upload photos of:</label
         >
         <ul>
-          <li v-for="item in huntItems" class="relative flex gap-x-3">
+          <li v-for="item in huntItems" class="relative flex gap-x-3" :class="completedStyle(item)">
             <div class="flex h-6 items-center">
               <input
                 :id="item"
                 type="radio"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                v-model="task"
+                v-model="selectedTask"
                 :value="item"
               />
             </div>
             <span
-              :class="{ 'text-gray-500': task && task !== item }"
+              :class="{ 'text-gray-500': selectedTask &&selectedTask !== item }"
               class="cursor-pointer"
-              @click="task = item"
-              >{{ item }}</span
-            >
+              @click="selectedTask = item"
+              >{{ item }}
+              <p v-if="selectedTask === item && completedItems.includes(item)" class="text-blue-400 ml-3">
+                <i>This will replace the previously uploaded photo for the hunt</i>
+              </p>
+              </span>
           </li>
         </ul>
         <div class="mt-2">or go ahead and upload any picture!</div>
@@ -127,6 +130,7 @@ const array_of_allowed_file_types = [
 
 export default defineComponent({
   // type inference enabled
+  name: "index",
   data() {
     return {
       testing: "",
@@ -158,7 +162,7 @@ export default defineComponent({
         "a LIT moment",
       ],
       objectives: [],
-      task: "",
+      selectedTask: "",
     };
   },
   async mounted() {
@@ -171,7 +175,8 @@ export default defineComponent({
         });
 
       console.log("getName json check", response, JSON.parse(response))
-      // this.completedItems = JSON.parse(response).completedTasks
+
+      this.completedItems = JSON.parse(response).completedTasks.map((task: string) => task.replace(/-/g, " "))
     } else {
       this.doesNeedsName = true;
     }
@@ -182,6 +187,17 @@ export default defineComponent({
     },
   },
   methods: {
+    completedStyle (task: string) {
+      if (this.completedItems.includes(task)) {
+        if (this.selectedTask !== task) {
+          return 'text-gray-500 line-through'
+        } else if (this.selectedTask === task) {
+          return ''
+        }
+      } else {
+        return ''
+      }
+    },
     async saveName() {
       localStorage.setItem("name", this.fullName);
       this.doesNeedsName = false;
@@ -236,7 +252,7 @@ export default defineComponent({
     async submit() {
       if (this.isSubmitting) return;
       if (!this.isPhotosFinishedLoading) return;
-      if (!this.task) {
+      if (!this.selectedTask) {
         this.showAlert(
           `Please choose which category your photo is in!`,
           "danger"
@@ -252,7 +268,7 @@ export default defineComponent({
           body: {
             photos: this.photos,
             name: this.fullName,
-            task: this.task,
+            task: this.selectedTask,
             completedTasks: this.completedItems,
           },
         });
@@ -288,11 +304,13 @@ export default defineComponent({
           const photoCount = this.photos.length;
           this.photos = [];
           this.showAlert(
-            `Successfully uploaded ${photoCount} photo${
+            `Uploaded ${photoCount} photo${
               photoCount > 1 ? "s" : ""
             }`,
             "success"
           );
+          this.completedItems.push(this.selectedTask)
+          this.selectedTask = "";
           this.isSubmitting = false;
         }
       } else {
@@ -324,5 +342,9 @@ export default defineComponent({
   border-left-color: #ddd;
   border-right-color: #ddd;
   border-top-color: #fff;
+}
+
+.line-through {
+  text-decoration: line-through;
 }
 </style>
