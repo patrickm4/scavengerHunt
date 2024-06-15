@@ -160,7 +160,7 @@ export default defineComponent({
         "you busting out a move on the dance floor",
         "you and someone related to the bride or groom",
         "something sweet",
-        "a lit moment",
+        "a lit moment",// TODO uppercase the lit
       ],
       objectives: [],
       selectedTask: "",

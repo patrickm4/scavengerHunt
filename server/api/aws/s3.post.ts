@@ -29,18 +29,30 @@ export default defineEventHandler(async (event) => {
             // let jsonUpdates = []
             let jsonUpdates: object[] = []
             const updateUserJson = (photoName: any) => {
-                // maybe we make a object version of the completed tasks
-                // { task: `${task}/${name}/${photo.name}` }
-                // this way we can also get the correct picture per person
+                // TODO need check if there is a task or if its just an any picture upload
+
+                //TODO add time stamp if tasks are complete
+                const completeCount = Object.entries(completedTasks).length + 1
+                let completedTime = null;
+
+                if (completeCount === 12) {
+                    // set time stamp
+                    completedTime = Date.now();
+                }
+
+                const sendObject = {
+                    completedTasks: {
+                        ...completedTasks,
+                        [task]: `${task}/${name}/${photoName}`
+                    },
+                }
+
+                if (completedTime) sendObject.completedBy = completedTime
+
                 const updateUserJsonCommand = new PutObjectCommand({
                     Bucket: "dopat-scavenger-hunt",
                     Key: `${name}/checklist.json`,
-                    Body: JSON.stringify({
-                        completedTasks: {
-                            ...completedTasks,
-                            [task]: `${task}/${name}/${photoName}`
-                        },
-                    }),
+                    Body: JSON.stringify(sendObject),
                     ContentType: "application/json"
                 })
 
