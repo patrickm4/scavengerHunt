@@ -48,22 +48,37 @@
           >Upload photos of:</label
         >
         <ul>
-          <li v-for="item in huntItems" class="relative flex gap-x-3">
+          <li
+            v-for="item in huntItems"
+            class="relative flex gap-x-3"
+            :class="completedStyle(item)"
+          >
             <div class="flex h-6 items-center">
               <input
                 :id="item"
                 type="radio"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                v-model="task"
+                v-model="selectedTask"
                 :value="item"
               />
             </div>
             <span
-              :class="{ 'text-gray-500': task && task !== item }"
+              :class="{
+                'text-gray-500': selectedTask && selectedTask !== item,
+              }"
               class="cursor-pointer"
-              @click="task = item"
-              >{{ item }}</span
-            >
+              @click="selectedTask = item"
+              >{{ item }}
+              <p
+                v-if="selectedTask === item && completedItems.includes(item)"
+                class="text-blue-400 ml-3"
+              >
+                <i
+                  >This will replace the previously uploaded photo for the
+                  hunt</i
+                >
+              </p>
+            </span>
           </li>
         </ul>
         <div class="mt-2">or go ahead and upload any picture!</div>
@@ -73,7 +88,7 @@
         <input
           type="file"
           class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
-          multiple
+          :multiple="selectedTask ? null : true"
           @change="setPhoto($event)"
         />
 
@@ -127,6 +142,7 @@ const array_of_allowed_file_types = [
 
 export default defineComponent({
   // type inference enabled
+  name: "index",
   data() {
     return {
       testing: "",
@@ -142,6 +158,8 @@ export default defineComponent({
       filesLength: 0,
       fullName: "",
       doesNeedsName: false,
+      completedItems: [],
+      completedItemsObj: null,
       huntItems: [
         "you the bride and groom",
         "you and the flower girl or the ring bearer",
@@ -149,21 +167,36 @@ export default defineComponent({
         "the newly weds kiss",
         "you in the rose garden",
         "you and a new friend",
-        "a selfie with your table",
-        "a toast/cheers",
+        "you and your table",
+        "a toast or cheers",
         "you busting out a move on the dance floor",
-        "you singing karaoke",
+        "you and someone related to the bride or groom",
         "something sweet",
-        "a LIT moment",
+        "a lit moment", // TODO uppercase the lit
       ],
       objectives: [],
-      task: "",
+      selectedTask: "",
     };
   },
-  mounted() {
+  async mounted() {
     const name = localStorage.getItem("name");
     if (name) {
       this.fullName = name;
+      // fetch their checklist
+      const response = await $fetch(
+        `/api/aws/user/s3?name=${encodeURIComponent(name)}`,
+        {
+          method: "GET",
+        }
+      );
+
+      console.log("getName json check1", response);
+      console.log("getName json check2", response, JSON.parse(response));
+
+      this.completedItems = Object.keys(
+        JSON.parse(response).completedTasks
+      ).map((task: string) => task.replace(/-/g, " "));
+      this.completedItemsObj = JSON.parse(response).completedTasks;
     } else {
       this.doesNeedsName = true;
     }
@@ -174,9 +207,29 @@ export default defineComponent({
     },
   },
   methods: {
-    saveName() {
+    completedStyle(task: string) {
+      if (this.completedItems.includes(task)) {
+        if (this.selectedTask !== task) {
+          return "text-gray-500 line-through";
+        } else if (this.selectedTask === task) {
+          return "";
+        }
+      } else {
+        return "";
+      }
+    },
+    async saveName() {
       localStorage.setItem("name", this.fullName);
       this.doesNeedsName = false;
+      // create a JSON for them under name/checklist
+      const response = await $fetch("/api/aws/user/s3", {
+        method: "POST",
+        body: {
+          name: this.fullName,
+        },
+      });
+
+      console.log("saveName check", response);
     },
     showAlert(msg: string, type: string, duration: number) {
       this.alert.message = msg;
@@ -219,13 +272,6 @@ export default defineComponent({
     async submit() {
       if (this.isSubmitting) return;
       if (!this.isPhotosFinishedLoading) return;
-      if (!this.task) {
-        this.showAlert(
-          `Please choose which category your photo is in!`,
-          "danger"
-        );
-        return;
-      }
 
       this.isSubmitting = true;
 
@@ -235,7 +281,8 @@ export default defineComponent({
           body: {
             photos: this.photos,
             name: this.fullName,
-            task: this.task,
+            task: this.selectedTask || null,
+            completedTasks: this.completedItemsObj,
           },
         });
 
@@ -270,11 +317,11 @@ export default defineComponent({
           const photoCount = this.photos.length;
           this.photos = [];
           this.showAlert(
-            `Successfully uploaded ${photoCount} photo${
-              photoCount > 1 ? "s" : ""
-            }`,
+            `Uploaded ${photoCount} photo${photoCount > 1 ? "s" : ""}`,
             "success"
           );
+          this.completedItems.push(this.selectedTask);
+          this.selectedTask = "";
           this.isSubmitting = false;
         }
       } else {
@@ -306,5 +353,9 @@ export default defineComponent({
   border-left-color: #ddd;
   border-right-color: #ddd;
   border-top-color: #fff;
+}
+
+.line-through {
+  text-decoration: line-through;
 }
 </style>
