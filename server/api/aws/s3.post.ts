@@ -2,6 +2,7 @@ import {
     S3Client,
     PutObjectCommand,
 } from "@aws-sdk/client-s3";
+import userGetJson from "@/server/api/aws/user/s3.get"
 
 interface Photo {
     fileb64String: string;
@@ -14,44 +15,50 @@ const s3Client = new S3Client({ region: 'us-west-2' });
 const array_of_allowed_files = ['png', 'jpeg', 'jpg', 'gif'];
 const array_of_allowed_file_types = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
 const allowed_file_size = 100;//mb
+const getUserJson = async (name: any) => {
+    return await userGetJson({
+        name
+    })
+}
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
-    // console.log("body name", body.name, body.name.replace(/\s/g, '-'))
-    console.log("body check", body)
-
     if (body?.photos && Array.isArray(body.photos) && body.name) {
         const name = body.name.replace(/\s/g, '-')
         const task = body.task ? body.task.toLowerCase().replace(/\s/g, '-') : 'general'
-        const completedTasks = body.completedTasks
+        const userJson = JSON.parse(await getUserJson(body.name))
+        const completedTasks = userJson?.completedTasks
 
         try {
-            // let jsonUpdates = []
             let jsonUpdates: object[] = []
-            const updateUserJson = (photoName: any) => {
+
+            const updateUserJson = async (photoName: any) => {
                 let completeCount = 0
+                // let sendObject = { ...userJson }
+                let sendObject = structuredClone(userJson)
 
-                // basically the user just uploaded their first photo
-                if (completedTasks) {
-                    completeCount = Object.entries(completedTasks).length + 1
+                if (task !== 'general') {
+                    // basically the user just uploaded their first photo
+                    if (completedTasks) {
+                        const completedLength = Object.entries(sendObject.completedTasks).length
+                        // they've completed right when doing the last task
+                        completeCount = completedLength + 1
+                        if (completeCount >= 12) {
+                            // basically if it was the last task, or if they reuploaded a previous task
+                            if (completedLength === 11 || completedLength > 11) {
+                                // set time stamp
+                                sendObject.completedBy = Date.now();
+                            }
+                        }
+                    }
+
+                    if (!sendObject.completedTasks) sendObject.completedTasks = {}
+                    sendObject.completedTasks[task] = `${task}/${name}/${photoName}`
+                } else {
+                    if (!sendObject['general']) sendObject['general'] = []
+                    sendObject['general'].push(`general/${name}/${photoName}`)
                 }
-
-                let completedTime = null;
-
-                if (completeCount === 12) {
-                    // set time stamp
-                    completedTime = Date.now();
-                }
-                // the json gets overwritten so we make sure to include the completed tasks again
-                const sendObject = {
-                    completedTasks: {
-                        ...completedTasks,
-                        [task]: `${task}/${name}/${photoName}`
-                    },
-                }
-
-                if (completedTime) sendObject.completedBy = completedTime
 
                 const updateUserJsonCommand = new PutObjectCommand({
                     Bucket: "dopat-scavenger-hunt",
@@ -87,9 +94,7 @@ export default defineEventHandler(async (event) => {
                     ContentType: 'image/jpeg'
                 });
 
-                if (task !== 'general') {
-                    updateUserJson(photo.name)
-                }
+                updateUserJson(photo.name)
 
                 return s3Client.send(command)
             }), ...jsonUpdates])

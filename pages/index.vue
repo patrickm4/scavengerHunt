@@ -17,16 +17,15 @@
     <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">
       Welcome to Dorothy and Patrick's
     </p>
-    <!-- <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Scavenger Hunt!</h1> -->
-    <!-- <p class="mt-6 text-xl leading-8 text-gray-700">Take a table selfie with each item or person then upload it here.</p> -->
-    <!-- <button @click="test" class="mt-6 block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">test</button> -->
-    <!-- <UploadForm /> -->
 
     <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
-      Wedding at Sage!
+      Wedding scavenger photo hunt at Sage!
     </h1>
-    <p class="mt-6 text-xl leading-8 text-gray-700">
+    <!-- <p class="mt-6 text-xl leading-8 text-gray-700">
       Upload photos through out the night here.
+    </p> -->
+    <p class="mt-6 text-xl leading-8 text-gray-700">
+      Step 1:
     </p>
 
     <template v-if="doesNeedsName">
@@ -54,6 +53,13 @@
             :class="completedStyle(item)"
           >
             <div class="flex h-6 items-center">
+              <!-- <input
+                :id="item"
+                type="radio"
+                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                v-model="selectedTask"
+                :value="item"
+              /> -->
               <input
                 :id="item"
                 type="radio"
@@ -81,14 +87,33 @@
             </span>
           </li>
         </ul>
-        <div class="mt-2">or go ahead and upload any picture!</div>
+        <div class="mt-4">
+          <input
+                id="general"
+                type="radio"
+                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                v-model="selectedTask"
+                value="general"
+              />
+          <span :class="{
+                'text-gray-500': selectedTask && selectedTask !== 'general',
+              }, 'ml-2'"
+              class="cursor-pointer"
+              @click="selectedTask = 'general'">
+              or go ahead and upload any picture!
+            </span></div>
       </div>
 
-      <div class="mt-10">
+      <p class="mt-4 text-xl leading-8 text-gray-700">
+        Step 2:
+      </p>
+
+      <div class="mt-2">
         <input
           type="file"
           class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
           :multiple="selectedTask ? null : true"
+          ref="fileupload"
           @change="setPhoto($event)"
         />
 
@@ -119,9 +144,13 @@
           </div>
         </div>
 
+        <p class="mt-8 text-xl leading-8 text-gray-700">
+          Step 3:
+        </p>
+
         <button
           type="button"
-          class="mt-8 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
+          class="mt-2 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
           @click="submit"
         >
           <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div>
@@ -165,7 +194,7 @@ export default defineComponent({
       fullName: "",
       doesNeedsName: false,
       completedItems: [],
-      completedItemsObj: null,
+      userJSON: null,
       huntItems: [
         "you the bride and groom",
         "you and the flower girl or the ring bearer",
@@ -182,10 +211,6 @@ export default defineComponent({
       ],
       objectives: [],
       selectedTask: "",
-      // hrefs: [],
-      href: '',
-
-
     };
   },
   async mounted() {
@@ -200,13 +225,15 @@ export default defineComponent({
         }
       );
 
-      console.log("getName json check1", response);
-      console.log("getName json check2", response, JSON.parse(response));
+      // console.log("check get user", JSON.parse(response))
 
-      this.completedItems = Object.keys(
-        JSON.parse(response).completedTasks
-      ).map((task: string) => task.replace(/-/g, " "));
-      this.completedItemsObj = JSON.parse(response).completedTasks;
+      this.userJSON = JSON.parse(response);
+
+      if (this.userJSON.completedTasks) {
+        this.completedItems = Object.keys(
+          this.userJSON.completedTasks
+        ).map((task: string) => task.replace(/-/g, " "));
+      }
     } else {
       this.doesNeedsName = true;
     }
@@ -293,8 +320,8 @@ export default defineComponent({
           body: {
             photos: this.photos,
             name: this.fullName,
-            task: this.selectedTask || null,
-            completedTasks: this.completedItemsObj,
+            task: this.selectedTask,
+            userJson: this.userJSON,
           },
         });
 
@@ -333,6 +360,7 @@ export default defineComponent({
             "success"
           );
           this.completedItems.push(this.selectedTask);
+          this.$refs.fileupload.value = "";
           this.selectedTask = "";
           this.isSubmitting = false;
         }
