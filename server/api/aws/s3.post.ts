@@ -20,9 +20,9 @@ export default defineEventHandler(async (event) => {
 
     console.log("body name", body.name, body.name.replace(/\s/g, '-'))
 
-    if (body?.photos && Array.isArray(body.photos) && body.name && body.task) {
+    if (body?.photos && Array.isArray(body.photos) && body.name) {
         const name = body.name.replace(/\s/g, '-')
-        const task = body.task.toLowerCase().replace(/\s/g, '-')
+        const task = body.task ? body.task.toLowerCase().replace(/\s/g, '-') : 'general'
         const completedTasks = body.completedTasks
 
         try {
@@ -31,7 +31,6 @@ export default defineEventHandler(async (event) => {
             const updateUserJson = (photoName: any) => {
                 // TODO need check if there is a task or if its just an any picture upload
 
-                //TODO add time stamp if tasks are complete
                 const completeCount = Object.entries(completedTasks).length + 1
                 let completedTime = null;
 
@@ -39,7 +38,7 @@ export default defineEventHandler(async (event) => {
                     // set time stamp
                     completedTime = Date.now();
                 }
-
+                // the json gets overwritten so we make sure to include the completed tasks again
                 const sendObject = {
                     completedTasks: {
                         ...completedTasks,
@@ -84,7 +83,9 @@ export default defineEventHandler(async (event) => {
                     ContentType: 'image/jpeg'
                 });
 
-                updateUserJson(photo.name)
+                if (task !== 'general') {
+                    updateUserJson(photo.name)
+                }
 
                 return s3Client.send(command)
             }), ...jsonUpdates])
