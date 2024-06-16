@@ -18,7 +18,8 @@ const allowed_file_size = 100;//mb
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
-    console.log("body name", body.name, body.name.replace(/\s/g, '-'))
+    // console.log("body name", body.name, body.name.replace(/\s/g, '-'))
+    console.log("body check", body)
 
     if (body?.photos && Array.isArray(body.photos) && body.name) {
         const name = body.name.replace(/\s/g, '-')
@@ -29,9 +30,13 @@ export default defineEventHandler(async (event) => {
             // let jsonUpdates = []
             let jsonUpdates: object[] = []
             const updateUserJson = (photoName: any) => {
-                // TODO need check if there is a task or if its just an any picture upload
+                let completeCount = 0
 
-                const completeCount = Object.entries(completedTasks).length + 1
+                // basically the user just uploaded their first photo
+                if (completedTasks) {
+                    completeCount = Object.entries(completedTasks).length + 1
+                }
+
                 let completedTime = null;
 
                 if (completeCount === 12) {
@@ -72,7 +77,6 @@ export default defineEventHandler(async (event) => {
                 if ((photo.size / (1024 * 1024)) > allowed_file_size) {
                     throw 'File too large';
                 }
-
                 const buf = Buffer.from(photo.fileb64String.replace(/^data:image\/\w+;base64,/, ""), 'base64')
 
                 const command = new PutObjectCommand({
@@ -89,6 +93,7 @@ export default defineEventHandler(async (event) => {
 
                 return s3Client.send(command)
             }), ...jsonUpdates])
+
 
             return responses
         } catch (err) {
