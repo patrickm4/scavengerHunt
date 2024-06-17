@@ -2,17 +2,14 @@
   <div div class="px-10 mt-8">
     <Alert :show="alert.isShowing" :message="alert.message" :type="alert.type"/>
     <div @click="$router.go(-1)">Back</div>
-    <section>
-      <p>See all photos from the wedding!</p>
-    </section>
-    <div>Show photos here</div>
-    <div v-if="photos?.length > 0">
-      <img 
-        v-for="img in photos" 
-        :src="img"
-      />
+    <div v-if="completedTasks">
+      <div v-for="(value, key) in completedTasks">
+        <p class="mt-6 text-xl leading-8 text-gray-700">
+          {{ hyphenToTitleCase(key) }}
+        </p>
+        <img :src="`https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${value}`" />
+      </div>
     </div>
-    <button @click="getPhotos">Get Photos</button>
   </div>
 </template>
 
@@ -20,20 +17,41 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
+  name: "Galleries",
  data() {
     return {
       photos: [],
       alert: {
         isShowing: false,
         message: '',
-        type: 'info'
+        type: 'info',
       },
+      completedTasks: null
     };
   },
-  created() {
-    // make a call to aws s3 to get the uploaded photos
+  async mounted () {
+    const queryName = this.$route.query.fullName;
+    const name = localStorage.getItem("name");
+    const isAdvanced = localStorage.getItem("advanced");
+
+    if (name === queryName || isAdvanced) {
+      const response = await $fetch(
+        `/api/aws/user/s3?name=${encodeURIComponent(queryName)}`,
+        {
+          method: "GET",
+        }
+      );
+
+      this.completedTasks = response.completedTasks;
+    }
   },
   methods: {
+    hyphenToTitleCase(input: string): string {
+      return input
+        .split('-') // Split the string by hyphens
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Convert each word to Title Case
+        .join(' '); // Join the words back with spaces
+    },
     showAlert(msg: string, type: string) {
       this.alert.message = msg
       this.alert.type = type
@@ -46,32 +64,6 @@ export default defineComponent({
         },100)
       }, 3000)  
     },
-    async getPhotos() {
-      const response = await $fetch('/api/aws/s3', {
-          method: 'GET'
-        })
-
-        console.log("s3 get", response)
-
-        if (response?.error) {
-          this.showAlert(`Error uploading photos - error: ${JSON.stringify(response.error)}`, 'danger')
-        } else {
-          // this.photos = response.contents.map(content => {
-
-          //   `https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${content.key}`
-          // })
-
-          this.photos = response.Contents.reduce((acc, cur) => {
-            // TODO maybe filter out any file that doesnt end in .jpg or .png?
-            console.log("currr", cur)
-            if (cur.Size !== 0) {
-              acc.push(`https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${cur.Key}`)
-            }
-
-            return acc
-          }, [])
-        }
-    }
   }
 });
 </script>

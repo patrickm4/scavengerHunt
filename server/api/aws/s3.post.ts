@@ -2,6 +2,7 @@ import {
     S3Client,
     PutObjectCommand,
 } from "@aws-sdk/client-s3";
+import userGetJson from "@/server/api/aws/user/s3.get"
 
 interface Photo {
     fileb64String: string;
@@ -14,39 +15,50 @@ const s3Client = new S3Client({ region: 'us-west-2' });
 const array_of_allowed_files = ['png', 'jpeg', 'jpg', 'gif'];
 const array_of_allowed_file_types = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
 const allowed_file_size = 100;//mb
+const getUserJson = async (name: any) => {
+    return await userGetJson({
+        name
+    })
+}
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
-    console.log("body name", body.name, body.name.replace(/\s/g, '-'))
-
     if (body?.photos && Array.isArray(body.photos) && body.name) {
         const name = body.name.replace(/\s/g, '-')
         const task = body.task ? body.task.toLowerCase().replace(/\s/g, '-') : 'general'
-        const completedTasks = body.completedTasks
+        const userJson = await getUserJson(body.name)
+        const completedTasks = userJson?.completedTasks
 
         try {
-            // let jsonUpdates = []
             let jsonUpdates: object[] = []
-            const updateUserJson = (photoName: any) => {
-                // TODO need check if there is a task or if its just an any picture upload
 
-                const completeCount = Object.entries(completedTasks).length + 1
-                let completedTime = null;
+            const updateUserJson = async (photoName: any) => {
+                let completeCount = 0
+                // let sendObject = { ...userJson }
+                let sendObject = structuredClone(userJson)
 
-                if (completeCount === 12) {
-                    // set time stamp
-                    completedTime = Date.now();
+                if (task !== 'general') {
+                    // basically the user just uploaded their first photo
+                    if (completedTasks) {
+                        const completedLength = Object.entries(sendObject.completedTasks).length
+                        // they've completed right when doing the last task
+                        completeCount = completedLength + 1
+                        if (completeCount >= 12) {
+                            // basically if it was the last task, or if they reuploaded a previous task
+                            if (completedLength === 11 || completedLength > 11) {
+                                // set time stamp
+                                sendObject.completedBy = Date.now();
+                            }
+                        }
+                    }
+
+                    if (!sendObject.completedTasks) sendObject.completedTasks = {}
+                    sendObject.completedTasks[task] = `${task}/${name}/${photoName}`
+                } else {
+                    if (!sendObject['general']) sendObject['general'] = []
+                    sendObject['general'].push(`general/${name}/${photoName}`)
                 }
-                // the json gets overwritten so we make sure to include the completed tasks again
-                const sendObject = {
-                    completedTasks: {
-                        ...completedTasks,
-                        [task]: `${task}/${name}/${photoName}`
-                    },
-                }
-
-                if (completedTime) sendObject.completedBy = completedTime
 
                 const updateUserJsonCommand = new PutObjectCommand({
                     Bucket: "dopat-scavenger-hunt",
@@ -72,7 +84,6 @@ export default defineEventHandler(async (event) => {
                 if ((photo.size / (1024 * 1024)) > allowed_file_size) {
                     throw 'File too large';
                 }
-
                 const buf = Buffer.from(photo.fileb64String.replace(/^data:image\/\w+;base64,/, ""), 'base64')
 
                 const command = new PutObjectCommand({
@@ -83,12 +94,11 @@ export default defineEventHandler(async (event) => {
                     ContentType: 'image/jpeg'
                 });
 
-                if (task !== 'general') {
-                    updateUserJson(photo.name)
-                }
+                updateUserJson(photo.name)
 
                 return s3Client.send(command)
             }), ...jsonUpdates])
+
 
             return responses
         } catch (err) {

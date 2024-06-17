@@ -11,22 +11,21 @@
       @clearPhotoInspect="previewPhotoToInspect = null"
     />
     <div class="flex justify-between">
-      <NuxtLink to="/galleries">Gallery</NuxtLink>
+       <template v-if="userJSON">
+         <NuxtLink :to="{ name: 'galleries', query: { fullName } }">Your gallery</NuxtLink>
+       </template>
+       <template v-else-if="!doesNeedsName">Loading...</template>
       <span v-if="!doesNeedsName && fullName">Hi, {{ fullName }}</span>
     </div>
     <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">
       Welcome to Dorothy and Patrick's
     </p>
-    <!-- <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Scavenger Hunt!</h1> -->
-    <!-- <p class="mt-6 text-xl leading-8 text-gray-700">Take a table selfie with each item or person then upload it here.</p> -->
-    <!-- <button @click="test" class="mt-6 block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">test</button> -->
-    <!-- <UploadForm /> -->
 
     <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
-      Wedding at Sage!
+      Wedding scavenger photo hunt at Sage!
     </h1>
     <p class="mt-6 text-xl leading-8 text-gray-700">
-      Upload photos through out the night here.
+      Step 1:
     </p>
 
     <template v-if="doesNeedsName">
@@ -81,14 +80,33 @@
             </span>
           </li>
         </ul>
-        <div class="mt-2">or go ahead and upload any picture!</div>
+        <div class="mt-4">
+          <input
+                id="general"
+                type="radio"
+                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                v-model="selectedTask"
+                value="general"
+              />
+          <span :class="{
+                'text-gray-500': selectedTask && selectedTask !== 'general',
+              }, 'ml-2'"
+              class="cursor-pointer"
+              @click="selectedTask = 'general'">
+              or go ahead and upload any picture!
+            </span></div>
       </div>
 
-      <div class="mt-10">
+      <p class="mt-4 text-xl leading-8 text-gray-700">
+        Step 2:
+      </p>
+
+      <div class="mt-2">
         <input
           type="file"
           class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
           :multiple="selectedTask ? null : true"
+          ref="fileupload"
           @change="setPhoto($event)"
         />
 
@@ -101,21 +119,31 @@
             loading
           </div>
           <div v-else class="flex thumbnail-container">
-            <img
-              v-for="photo in photos"
-              class="mr-2 photo-thumbnail"
-              :src="photo.fileb64String"
-              :alt="photo.name"
-              height="250"
-              width="auto"
-              @click="previewPhotoToInspect = photo"
-            />
+            <div v-for="photo in photos" class="mr-2 ">
+              <img
+                class="photo-thumbnail"
+                :src="photo.fileb64String"
+                :alt="photo.name"
+                height="250"
+                width="auto"
+                @click="previewPhotoToInspect = photo"
+              />
+              <!-- <a v-if="photo.href" :href="photo.href" class="mt-5 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30" download>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+              </a> -->
+            </div>
           </div>
         </div>
 
+        <p class="mt-8 text-xl leading-8 text-gray-700">
+          Step 3:
+        </p>
+
         <button
           type="button"
-          class="mt-8 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
+          class="mt-2 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
           @click="submit"
         >
           <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div>
@@ -159,7 +187,7 @@ export default defineComponent({
       fullName: "",
       doesNeedsName: false,
       completedItems: [],
-      completedItemsObj: null,
+      userJSON: null,
       huntItems: [
         "you the bride and groom",
         "you and the flower girl or the ring bearer",
@@ -190,13 +218,15 @@ export default defineComponent({
         }
       );
 
-      console.log("getName json check1", response);
-      console.log("getName json check2", response, JSON.parse(response));
+      // console.log("check get user", response);
 
-      this.completedItems = Object.keys(
-        JSON.parse(response).completedTasks
-      ).map((task: string) => task.replace(/-/g, " "));
-      this.completedItemsObj = JSON.parse(response).completedTasks;
+      this.userJSON = response;
+
+      if (this.userJSON.completedTasks) {
+        this.completedItems = Object.keys(
+          this.userJSON.completedTasks
+        ).map((task: string) => task.replace(/-/g, " "));
+      }
     } else {
       this.doesNeedsName = true;
     }
@@ -245,6 +275,7 @@ export default defineComponent({
     },
     setPhoto(event: Event) {
       this.filesLength = event.target.files.length || 0;
+
       this.photos = [];
 
       if ((event.target as HTMLInputElement)?.files) {
@@ -264,6 +295,7 @@ export default defineComponent({
               name: file.name,
               type: file.type,
               size: file.size,
+              href: URL.createObjectURL(file),
             });
           };
         }
@@ -281,8 +313,8 @@ export default defineComponent({
           body: {
             photos: this.photos,
             name: this.fullName,
-            task: this.selectedTask || null,
-            completedTasks: this.completedItemsObj,
+            task: this.selectedTask,
+            userJson: this.userJSON,
           },
         });
 
@@ -321,6 +353,7 @@ export default defineComponent({
             "success"
           );
           this.completedItems.push(this.selectedTask);
+          this.$refs.fileupload.value = "";
           this.selectedTask = "";
           this.isSubmitting = false;
         }
