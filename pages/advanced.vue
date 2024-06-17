@@ -48,7 +48,6 @@ export default defineComponent({
     };
   },
   async mounted () {
-    console.log("advanced mounted")
     localStorage.setItem("advanced", true);
     // get buckets
     const response = await $fetch(

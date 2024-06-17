@@ -218,7 +218,7 @@ export default defineComponent({
         }
       );
 
-      console.log("check get user", response);
+      // console.log("check get user", response);
 
       this.userJSON = response;
 

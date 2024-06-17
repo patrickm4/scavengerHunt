@@ -8,8 +8,6 @@ const s3Client = new S3Client({ region: 'us-west-2' });
 export default defineEventHandler(async (event) => {
     const query = getQuery(event)
     let key = ''
-    console.log("running get user json1", query)
-    console.log("running get user json2", event.fullKey)
 
     if (!event.fullKey) {
         const username = query?.name ? query.name : event.name
