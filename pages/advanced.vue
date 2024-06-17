@@ -17,12 +17,7 @@
       <div v-for="user in users">
         <div class="flex justify-between items-center mt-5">
           <div class="flex items-start flex-col">
-            <!-- TODO show users photos to verify hunt is correct -->
-            <!-- <img
-              :src="user?.photo"
-              alt="profile"
-              class="h-10 w-10 rounded-full"
-            /> -->
+            <!-- TODO split up into general and scavenger hunt -->
             <div class="text-base font-semibold leading-7 text-yellow-900">
               {{ user?.name }}
             </div>
@@ -54,6 +49,7 @@ export default defineComponent({
   },
   async mounted () {
     console.log("advanced mounted")
+    localStorage.setItem("advanced", true);
     // get buckets
     const response = await $fetch(
         `/api/aws/advanced/s3.userObjs`,

@@ -11,10 +11,10 @@
       @clearPhotoInspect="previewPhotoToInspect = null"
     />
     <div class="flex justify-between">
-      <!-- <NuxtLink to="/galleries">Your gallery</NuxtLink> -->
        <template v-if="userJSON">
          <NuxtLink :to="{ name: 'galleries', query: { fullName } }">Your gallery</NuxtLink>
        </template>
+       <template v-else-if="!doesNeedsName">Loading...</template>
       <span v-if="!doesNeedsName && fullName">Hi, {{ fullName }}</span>
     </div>
     <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">
@@ -24,9 +24,6 @@
     <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
       Wedding scavenger photo hunt at Sage!
     </h1>
-    <!-- <p class="mt-6 text-xl leading-8 text-gray-700">
-      Upload photos through out the night here.
-    </p> -->
     <p class="mt-6 text-xl leading-8 text-gray-700">
       Step 1:
     </p>
