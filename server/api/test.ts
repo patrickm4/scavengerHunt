@@ -1,33 +1,73 @@
 import {
     S3Client,
-    PutObjectCommand,
+    // PutObjectCommand,
     // CreateBucketCommand,
     // DeleteObjectCommand,
     // DeleteBucketCommand,
     // paginateListObjectsV2,
     // GetObjectCommand,
-    ListBucketsCommand
+    // ListBucketsCommand
+    ListObjectsV2Command
 } from "@aws-sdk/client-s3";
 
-const s3Client = new S3Client({});
+const s3Client = new S3Client({ region: 'us-west-2' });
+import userGetJson from "@/server/api/aws/user/s3.get"
 
 export default defineEventHandler(async (event) => {
     console.log("running test3")
 
-    const command = new ListBucketsCommand({});
-
     try {
-        const { Owner, Buckets } = await s3Client.send(command);
+        const command = new ListObjectsV2Command({
+            Bucket: "dopat-scavenger-hunt",
+            delimiter: '/',
+        });
 
-        console.log(
-            `${Owner.DisplayName} owns ${Buckets.length} bucket${Buckets.length === 1 ? "" : "s"
-            }:`,
-        );
+        const response = await s3Client.send(command)
 
-        console.log(`${Buckets.map((b) => ` • ${b.Name}`).join("\n")}`);
+        // console.log("checkkk", response.Contents, typeof response.Contents)
+
+        return await Promise.allSettled(response?.Contents?.reduce((acc, obj) => {
+            if (obj.Key.endsWith('.json')) {
+                acc.push(userGetJson({ fullKey: obj.Key }))
+                return acc
+            } else {
+                return acc
+            }
+        }, []))
+
+        // return response.Contents.reduce((acc, obj) => {
+        //     // console.log("checkkk", obj, obj.key)
+        //     if (obj.Key.endsWith('.json')) {
+        //         acc.push(obj.Key)
+        //         return acc
+        //     }   
+        //     // return obj.Key.endsWith('.json')
+        // }, [])
+
+        // console.log("checkkk", responses)
+
+        // return response
     } catch (err) {
         console.error(err);
+        return {
+            error: err
+        }
     }
+
+    // const command = new ListBucketsCommand({});
+
+    // try {
+    //     const { Owner, Buckets } = await s3Client.send(command);
+
+    //     console.log(
+    //         `${Owner.DisplayName} owns ${Buckets.length} bucket${Buckets.length === 1 ? "" : "s"
+    //         }:`,
+    //     );
+
+    //     console.log(`${Buckets.map((b) => ` • ${b.Name}`).join("\n")}`);
+    // } catch (err) {
+    //     console.error(err);
+    // }
 
     // const command = new PutObjectCommand({
     //     Bucket: "dopat-scavenger-hunt",

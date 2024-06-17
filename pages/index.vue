@@ -11,7 +11,10 @@
       @clearPhotoInspect="previewPhotoToInspect = null"
     />
     <div class="flex justify-between">
-      <NuxtLink to="/galleries">Gallery</NuxtLink>
+      <!-- <NuxtLink to="/galleries">Your gallery</NuxtLink> -->
+       <template v-if="userJSON">
+         <NuxtLink :to="{ name: 'galleries', query: { fullName } }">Your gallery</NuxtLink>
+       </template>
       <span v-if="!doesNeedsName && fullName">Hi, {{ fullName }}</span>
     </div>
     <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">
@@ -53,13 +56,6 @@
             :class="completedStyle(item)"
           >
             <div class="flex h-6 items-center">
-              <!-- <input
-                :id="item"
-                type="radio"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                v-model="selectedTask"
-                :value="item"
-              /> -->
               <input
                 :id="item"
                 type="radio"
@@ -225,9 +221,9 @@ export default defineComponent({
         }
       );
 
-      // console.log("check get user", JSON.parse(response))
+      console.log("check get user", response);
 
-      this.userJSON = JSON.parse(response);
+      this.userJSON = response;
 
       if (this.userJSON.completedTasks) {
         this.completedItems = Object.keys(

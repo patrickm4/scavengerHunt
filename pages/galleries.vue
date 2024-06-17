@@ -2,7 +2,7 @@
   <div div class="px-10 mt-8">
     <Alert :show="alert.isShowing" :message="alert.message" :type="alert.type"/>
     <div @click="$router.go(-1)">Back</div>
-    <section>
+    <!-- <section>
       <p>See all photos from the wedding!</p>
     </section>
     <div>Show photos here</div>
@@ -12,7 +12,7 @@
         :src="img"
       />
     </div>
-    <button @click="getPhotos">Get Photos</button>
+    <button @click="getPhotos">Get Photos</button> -->
   </div>
 </template>
 
@@ -20,6 +20,7 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
+  name: "Galleries",
  data() {
     return {
       photos: [],
@@ -30,8 +31,17 @@ export default defineComponent({
       },
     };
   },
-  created() {
-    // make a call to aws s3 to get the uploaded photos
+  mounted () {
+    console.log("chec kroute params", this.$route.params, this.$route.query)
+    const queryName = this.$route.query.fullName;
+    const name = localStorage.getItem("name");
+    const isAdvanced = localStorage.getItem("advanced");
+
+    console.log("gallery check queryName", queryName)
+    console.log("gallery check name", name)
+    if (name === queryName || isAdvanced) {
+      console.log("gallery check name match")
+    }
   },
   methods: {
     showAlert(msg: string, type: string) {
@@ -46,32 +56,32 @@ export default defineComponent({
         },100)
       }, 3000)  
     },
-    async getPhotos() {
-      const response = await $fetch('/api/aws/s3', {
-          method: 'GET'
-        })
+    // async getPhotos() {
+    //   const response = await $fetch('/api/aws/s3', {
+    //       method: 'GET'
+    //     })
 
-        console.log("s3 get", response)
+    //     console.log("s3 get", response)
 
-        if (response?.error) {
-          this.showAlert(`Error uploading photos - error: ${JSON.stringify(response.error)}`, 'danger')
-        } else {
-          // this.photos = response.contents.map(content => {
+    //     if (response?.error) {
+    //       this.showAlert(`Error uploading photos - error: ${JSON.stringify(response.error)}`, 'danger')
+    //     } else {
+    //       // this.photos = response.contents.map(content => {
 
-          //   `https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${content.key}`
-          // })
+    //       //   `https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${content.key}`
+    //       // })
 
-          this.photos = response.Contents.reduce((acc, cur) => {
-            // TODO maybe filter out any file that doesnt end in .jpg or .png?
-            console.log("currr", cur)
-            if (cur.Size !== 0) {
-              acc.push(`https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${cur.Key}`)
-            }
+    //       this.photos = response.Contents.reduce((acc, cur) => {
+    //         // TODO maybe filter out any file that doesnt end in .jpg or .png?
+    //         console.log("currr", cur)
+    //         if (cur.Size !== 0) {
+    //           acc.push(`https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${cur.Key}`)
+    //         }
 
-            return acc
-          }, [])
-        }
-    }
+    //         return acc
+    //       }, [])
+    //     }
+    // }
   }
 });
 </script>

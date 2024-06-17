@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     if (body?.photos && Array.isArray(body.photos) && body.name) {
         const name = body.name.replace(/\s/g, '-')
         const task = body.task ? body.task.toLowerCase().replace(/\s/g, '-') : 'general'
-        const userJson = JSON.parse(await getUserJson(body.name))
+        const userJson = await getUserJson(body.name)
         const completedTasks = userJson?.completedTasks
 
         try {
