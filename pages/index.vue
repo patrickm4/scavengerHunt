@@ -23,10 +23,7 @@
 
     <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
       Wedding scavenger photo hunt at Sage!
-    </h1>
-    <p class="mt-6 text-xl leading-8 text-gray-700">
-      Step 1:
-    </p>
+    </h1>    
 
     <template v-if="doesNeedsName">
       <FullNameInput v-model:fullName="fullName" @saveName="saveName" />
@@ -40,11 +37,14 @@
     </template>
 
     <template v-else-if="!doesNeedsName && fullName">
+      <p class="mt-6 text-xl leading-8 text-gray-700">
+        Step 1:
+      </p>
       <div class="mt-2">
         <label
           for="email"
           class="block text-sm font-medium leading-6 text-gray-900 mb-2"
-          >Upload photos of:</label
+          >Select category:</label
         >
         <ul>
           <li
