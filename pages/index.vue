@@ -15,7 +15,13 @@
          <NuxtLink :to="{ name: 'galleries', query: { fullName } }">Your gallery</NuxtLink>
        </template>
        <template v-else-if="!doesNeedsName">Loading...</template>
-      <span v-if="!doesNeedsName && fullName">Hi, {{ fullName }}</span>
+      <div v-if="!doesNeedsName && fullName" class="cursor-pointer" @click="isUserMenuOpen = !isUserMenuOpen">Hi, {{ fullName }}</div>
+      <div v-if="isUserMenuOpen" class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none top-14" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+        <div class="py-1 mr-2" role="none">
+          <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
+          <button type="button" class="block w-full px-4 py-2 text-left text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-1" @click="changeName">Change name</button>
+        </div>
+      </div>
     </div>
     <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">
       Welcome to Dorothy and Patrick's
@@ -204,6 +210,7 @@ export default defineComponent({
       ],
       objectives: [],
       selectedTask: "",
+      isUserMenuOpen: false
     };
   },
   async mounted() {
@@ -211,22 +218,25 @@ export default defineComponent({
     if (name) {
       this.fullName = name;
       // fetch their checklist
-      const response = await $fetch(
-        `/api/aws/user/s3?name=${encodeURIComponent(name)}`,
-        {
-          method: "GET",
-        }
-      );
 
-      // console.log("check get user", response);
+      this.fetchUserJson()
 
-      this.userJSON = response;
+      // const response = await $fetch(
+      //   `/api/aws/user/s3?name=${encodeURIComponent(name)}`,
+      //   {
+      //     method: "GET",
+      //   }
+      // );
 
-      if (this.userJSON.completedTasks) {
-        this.completedItems = Object.keys(
-          this.userJSON.completedTasks
-        ).map((task: string) => task.replace(/-/g, " "));
-      }
+      // // console.log("check get user", response);
+
+      // this.userJSON = response;
+
+      // if (this.userJSON.completedTasks) {
+      //   this.completedItems = Object.keys(
+      //     this.userJSON.completedTasks
+      //   ).map((task: string) => task.replace(/-/g, " "));
+      // }
     } else {
       this.doesNeedsName = true;
     }
@@ -237,6 +247,33 @@ export default defineComponent({
     },
   },
   methods: {
+    async fetchUserJson() {
+      // fetch their checklist
+      const response = await $fetch(
+        `/api/aws/user/s3?name=${encodeURIComponent(this.fullName)}`,
+        {
+          method: "GET",
+        }
+      );
+
+      console.log("check get user", response);
+
+      this.userJSON = response;
+
+      if (this.userJSON.completedTasks) {
+        this.completedItems = Object.keys(
+          this.userJSON.completedTasks
+        ).map((task: string) => task.replace(/-/g, " "));
+      }
+    },
+    changeName() {
+      this.fullName = ''
+      localStorage.removeItem("name");
+      this.isUserMenuOpen = false
+      // clear the completed, TODO maybe we should grab the userJSON again and fulfill the completedItems. This way online one person is using that name?
+      this.completedItems = []
+      this.doesNeedsName = true;
+    },
     completedStyle(task: string) {
       if (this.completedItems.includes(task)) {
         if (this.selectedTask !== task) {
