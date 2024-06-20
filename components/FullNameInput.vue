@@ -1,6 +1,6 @@
 <template>
-  <div class="mt-2">
-    <label>Enter your full name</label>
+  <div class="mt-5">
+    <label>Enter your full name to start</label>
     <input
       :value="fullName"
       @input="$emit('update:fullName', $event.target.value)"

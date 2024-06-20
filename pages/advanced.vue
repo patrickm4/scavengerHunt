@@ -12,14 +12,30 @@
     <p class="mt-6 text-xl leading-8 text-gray-700">
       First to finish: {{ whoFinishedFirst?.name }}
     </p>
+    <!-- TODO click Categories title to go to display page and show ALL photos, perfect for a slide show -->
+    <p class="mt-6 text-xl leading-8 text-gray-700">
+      Categories
+    </p>
+    <!-- TODO open a new page, pass val in and display photos there -->
+    <div v-for="[key, val] in categoryList">
+      <p class="mt-2">
+        {{ key }}
+      </p>
+      <!-- <div>
+        {{val}}
+      </div> -->
+    </div>
 
+    <p class="mt-8 text-xl leading-8 text-gray-700">
+      Guests
+    </p>
     <div v-if="users?.length > 0">
       <div v-for="user in users">
         <div class="flex justify-between items-center mt-5">
           <div class="flex items-start flex-col">
             <!-- TODO split up into general and scavenger hunt -->
             <div class="text-base font-semibold leading-7 text-yellow-900">
-              {{ user?.name }}
+              <NuxtLink :to="{ name: 'galleries', query: { fullName: user.name} }">{{user.name}}</NuxtLink>
             </div>
             <div class="ml-3">
               scavenger hunt progress:
@@ -67,6 +83,22 @@ export default defineComponent({
       },[])
   },
   computed: {
+    categoryList () {
+      // iterate through users completedTasks add each key to a new map, with name and key
+      return this.users.reduce((acc, cur) => {
+        if (!cur.completedTasks || cur.completedTasks.length === 0) return acc
+
+        Object.entries(cur.completedTasks).forEach(([key, value]) => {
+          if (!acc.has(key)) {
+            acc.set(key, [{ [cur.name]: value }])
+          } else {
+            const existing = acc.get(key)
+            acc.set(key, [...existing, { [cur.name]: value }])
+          }
+        })
+        return acc
+      }, new Map())
+    },
     whoFinishedFirst () {
       return this.users.reduce((acc, cur) => {
         if (Object.entries(cur.completedTasks).length === 12) {
