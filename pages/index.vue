@@ -217,26 +217,8 @@ export default defineComponent({
     const name = localStorage.getItem("name");
     if (name) {
       this.fullName = name;
-      // fetch their checklist
-
+      
       this.fetchUserJson()
-
-      // const response = await $fetch(
-      //   `/api/aws/user/s3?name=${encodeURIComponent(name)}`,
-      //   {
-      //     method: "GET",
-      //   }
-      // );
-
-      // // console.log("check get user", response);
-
-      // this.userJSON = response;
-
-      // if (this.userJSON.completedTasks) {
-      //   this.completedItems = Object.keys(
-      //     this.userJSON.completedTasks
-      //   ).map((task: string) => task.replace(/-/g, " "));
-      // }
     } else {
       this.doesNeedsName = true;
     }
