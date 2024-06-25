@@ -29,14 +29,13 @@ export default defineEventHandler(async (event) => {
         const task = body.task ? body.task.toLowerCase().replace(/\s/g, '-') : 'general'
         const userJson = await getUserJson(body.name)
         const completedTasks = userJson?.completedTasks
+        let sendObject = structuredClone(userJson)
 
         try {
             let jsonUpdates: object[] = []
 
             const updateUserJson = async (photoName: any) => {
                 let completeCount = 0
-                // let sendObject = { ...userJson }
-                let sendObject = structuredClone(userJson)
 
                 if (task !== 'general') {
                     // basically the user just uploaded their first photo
@@ -57,7 +56,7 @@ export default defineEventHandler(async (event) => {
                     sendObject.completedTasks[task] = `${task}/${name}/${photoName}`
                 } else {
                     if (!sendObject['general']) sendObject['general'] = []
-                    sendObject['general'].push(`general/${name}/${photoName}`)
+                    sendObject['general'] = [...sendObject['general'], `general/${name}/${photoName}`]
                 }
 
                 const updateUserJsonCommand = new PutObjectCommand({
@@ -77,7 +76,7 @@ export default defineEventHandler(async (event) => {
                     ((photo.name.lastIndexOf('.') - 1) >>> 0) + 2
                 );
 
-                if (!array_of_allowed_files.includes(file_extension) || !array_of_allowed_file_types.includes(photo.type)) {
+                if (!array_of_allowed_files.includes(file_extension.toLowerCase()) || !array_of_allowed_file_types.includes(photo.type)) {
                     throw 'Invalid file';
                 }
 
