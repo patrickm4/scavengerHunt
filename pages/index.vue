@@ -129,7 +129,7 @@
           class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
           :multiple="selectedTask ? null : true"
           ref="fileupload"
-          accept="image/*" capture
+          accept="image/*"
           @change="setPhoto($event)"
         />
 
@@ -142,21 +142,20 @@
             loading
           </div>
           <div v-else class="flex thumbnail-container">
-            <div v-for="photo in photos" class="mr-2 ">
-              <img
-                class="photo-thumbnail"
-                :src="photo.fileb64String"
-                :alt="photo.name"
-                height="250"
-                width="auto"
-                @click="previewPhotoToInspect = photo"
-              />
-              <!-- <a v-if="photo.href" :href="photo.href" class="mt-5 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30" download>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                </svg>
-              </a> -->
-            </div>
+            <img
+              v-for="photo in photos"
+              class="photo-thumbnail mr-2"
+              :src="photo.fileb64String"
+              :alt="photo.name"
+              height="250"
+              width="auto"
+              @click="previewPhotoToInspect = photo"
+            />
+            <!-- <a v-if="photo.href" :href="photo.href" class="mt-5 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30" download>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+            </a> -->
           </div>
         </div>
 
