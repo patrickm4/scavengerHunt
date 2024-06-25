@@ -29,14 +29,13 @@ export default defineEventHandler(async (event) => {
         const task = body.task ? body.task.toLowerCase().replace(/\s/g, '-') : 'general'
         const userJson = await getUserJson(body.name)
         const completedTasks = userJson?.completedTasks
+        let sendObject = structuredClone(userJson)
 
         try {
             let jsonUpdates: object[] = []
 
             const updateUserJson = async (photoName: any) => {
                 let completeCount = 0
-                // let sendObject = { ...userJson }
-                let sendObject = structuredClone(userJson)
 
                 if (task !== 'general') {
                     // basically the user just uploaded their first photo
