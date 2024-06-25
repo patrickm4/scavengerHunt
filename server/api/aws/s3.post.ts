@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
                     sendObject.completedTasks[task] = `${task}/${name}/${photoName}`
                 } else {
                     if (!sendObject['general']) sendObject['general'] = []
-                    sendObject['general'].push(`general/${name}/${photoName}`)
+                    sendObject['general'] = [...sendObject['general'], `general/${name}/${photoName}`]
                 }
 
                 const updateUserJsonCommand = new PutObjectCommand({
@@ -77,7 +77,7 @@ export default defineEventHandler(async (event) => {
                     ((photo.name.lastIndexOf('.') - 1) >>> 0) + 2
                 );
 
-                if (!array_of_allowed_files.includes(file_extension) || !array_of_allowed_file_types.includes(photo.type)) {
+                if (!array_of_allowed_files.includes(file_extension.toLowerCase()) || !array_of_allowed_file_types.includes(photo.type)) {
                     throw 'Invalid file';
                 }
 
