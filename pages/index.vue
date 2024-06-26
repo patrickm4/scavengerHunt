@@ -142,15 +142,28 @@
             loading
           </div>
           <div v-else class="flex thumbnail-container">
-            <img
-              v-for="photo in photos"
-              class="photo-thumbnail mr-2"
-              :src="photo.fileb64String"
-              :alt="photo.name"
-              height="250"
-              width="auto"
-              @click="previewPhotoToInspect = photo"
-            />
+            <div
+              v-for="photo in photos" 
+              :key="photo.name"
+              class="mr-4"
+            >
+              <img
+                class="photo-thumbnail mr-2"
+                :src="photo.fileb64String"
+                :alt="photo.name"
+                height="250"
+                width="auto"
+                @click="previewPhotoToInspect = photo"
+              />
+              <button
+                type="button"
+                class="mt-2 flex w-full justify-center rounded-md bg-red-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
+                @click="deleteDraftPhoto(photo)"
+              >
+                <!-- <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div> -->
+                Remove
+              </button>
+            </div>
             <!-- <a v-if="photo.href" :href="photo.href" class="mt-5 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30" download>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -249,6 +262,10 @@ export default defineComponent({
     },
   },
   methods: {
+    deleteDraftPhoto(photoName) {
+      this.photos = this.photos.filter((photo) => photo.name !== photoName.name);
+      this.filesLength--
+    },
     async fetchUserJson() {
       // fetch their checklist
       const response = await $fetch(
