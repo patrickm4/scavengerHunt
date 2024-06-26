@@ -42,7 +42,7 @@
               {{ Object.entries(user.completedTasks).length }} / 12
             </div>
             <div class="ml-3">
-              general photos uploaded: {{ Array.isArray(users.general) && user.general?.length || 0 }}
+              general photos uploaded: {{ user.general?.length || 0 }}
             </div>
             <div v-if="user.completedBy" class="ml-3">
               {{new Date(user.completedBy)}}
