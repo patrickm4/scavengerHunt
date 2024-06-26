@@ -19,13 +19,16 @@ export default defineEventHandler(async (event) => {
 
     try {
         const response = await s3Client.send(command);
+        return {
+            ok: true, userJson: {
+                completedTasks: {},
+            }
+        }
     } catch (err) {
         console.error(err);
         return {
             error: `${err}`
         }
-    } finally {
-        return 'test aws api complete'
     }
 
 })

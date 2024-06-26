@@ -11,10 +11,10 @@
       @clearPhotoInspect="previewPhotoToInspect = null"
     />
     <div class="flex justify-between">
-       <template v-if="userJSON">
+       <template v-if="!userJSON && !doesNeedsName">Loading...</template>
+       <template v-else-if="userJSON && !doesNeedsName">
          <NuxtLink :to="{ name: 'galleries', query: { fullName } }">Your gallery</NuxtLink>
        </template>
-       <template v-else-if="!doesNeedsName">Loading...</template>
       <div v-if="!doesNeedsName && fullName" class="cursor-pointer" @click="isUserMenuOpen = !isUserMenuOpen">Hi, {{ fullName }}</div>
       <div v-if="isUserMenuOpen" class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none top-14" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
         <div class="py-1 mr-2" role="none">
@@ -298,7 +298,13 @@ export default defineComponent({
         },
       });
 
-      console.log("saveName check", response);
+      if (response.ok) {
+        this.userJSON = response.userJson;
+      } else {
+        // need to try entering the name again
+        this.doesNeedsName = true;
+        this.showAlert(`Error setting up name - refresh and try again`, "danger");
+      }
     },
     showAlert(msg: string, type: string, duration: number) {
       this.alert.message = msg;
