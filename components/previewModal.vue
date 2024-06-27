@@ -21,7 +21,7 @@ export default {
 
 <style>
 .preview-modal {
-    position: absolute;
+    position: fixed;
     top: 0;
     left:0;
     height: 100vh !important;

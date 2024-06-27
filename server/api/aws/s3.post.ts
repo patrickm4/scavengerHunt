@@ -81,7 +81,8 @@ export default defineEventHandler(async (event) => {
                     Key: `${task}/${username}/${photo.name}`,
                     Body: buf,
                     ContentEncoding: 'base64',
-                    ContentType: 'image/jpeg'
+                    ContentType: 'image/jpeg',
+                    ContentDisposition: 'attachment',
                 });
 
 
