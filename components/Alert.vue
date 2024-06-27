@@ -43,6 +43,7 @@ export default {
     width:100%;
     height:3rem;
     margin-top: 0.5rem;
+    z-index: 999999;
 }
 .alert-msg-box {
     border-radius: 0.375rem;
