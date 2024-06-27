@@ -7,7 +7,7 @@
         Scavenger hunt photos
       </p> -->
       <!-- <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="isShowingCompletedTasks = !isShowingCompletedTasks">
-        Scavenger hunt photos
+        Show scavenger hunt photos
       </button><div v-if="!completedTasks && isShowingCompletedTasks">No scavenger hunt photos uploaded</div>
       <div v-else-if="completedTasks && isShowingCompletedTasks">
         <div v-for="(value, key) in completedTasks">
@@ -19,11 +19,11 @@
       </div>
     </div> -->
     <div class="mt-5">
-      <!-- <p class="mt-6 text-xl leading-8 text-gray-700">
+      <p class="mt-6 text-xl leading-8 text-gray-700">
         General photos
-      </p> -->
+      </p>
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="isShowingGeneralPhotos = !isShowingGeneralPhotos">
-        General photos
+        Show general photos
       </button>
       <div v-if="!generalPhotos && isShowingGeneralPhotos">No general photos uploaded</div>
       <div v-else-if="generalPhotos && isShowingGeneralPhotos">

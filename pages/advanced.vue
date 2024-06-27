@@ -21,9 +21,9 @@
       <p class="mt-2">
         {{ key }}
       </p>
-      <!-- <div>
+      <div>
         {{val}}
-      </div> -->
+      </div>
     </div>
 
     <p class="mt-8 text-xl leading-8 text-gray-700">
@@ -33,7 +33,6 @@
       <div v-for="user in users">
         <div class="flex justify-between items-center mt-5">
           <div class="flex items-start flex-col">
-            <!-- TODO split up into general and scavenger hunt -->
             <div class="text-base font-semibold leading-7 text-yellow-900">
               <NuxtLink :to="{ name: 'galleries', query: { fullName: user.name} }">{{user.name}}</NuxtLink>
             </div>
@@ -42,7 +41,7 @@
               {{ Object.entries(user.completedTasks).length }} / 12
             </div>
             <div class="ml-3">
-              general photos uploaded: {{ Array.isArray(users.general) && user.general?.length || 0 }}
+              general photos uploaded: {{ user.general?.length || 0 }}
             </div>
             <div v-if="user.completedBy" class="ml-3">
               {{new Date(user.completedBy)}}

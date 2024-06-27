@@ -24,15 +24,15 @@ const getUserJson = async (name: any) => {
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
+
     if (body?.photos && Array.isArray(body.photos) && body.name) {
-        const name = body.name.replace(/\s/g, '-')
+        const username = body.name.replace(/\s/g, '-')
         const task = body.task ? body.task.toLowerCase().replace(/\s/g, '-') : 'general'
         const userJson = await getUserJson(body.name)
         const completedTasks = userJson?.completedTasks
         let sendObject = structuredClone(userJson)
 
         try {
-            let jsonUpdates: object[] = []
 
             const updateUserJson = async (photoName: any) => {
                 let completeCount = 0
@@ -53,24 +53,15 @@ export default defineEventHandler(async (event) => {
                     }
 
                     if (!sendObject.completedTasks) sendObject.completedTasks = {}
-                    sendObject.completedTasks[task] = `${task}/${name}/${photoName}`
+                    sendObject.completedTasks[task] = `${task}/${username}/${photoName}`
                 } else {
-                    if (!sendObject['general']) sendObject['general'] = []
-                    sendObject['general'] = [...sendObject['general'], `general/${name}/${photoName}`]
+                    if (!sendObject.general) sendObject.general = []
+                    sendObject.general = [...sendObject.general, `general/${username}/${photoName}`]
                 }
-
-                const updateUserJsonCommand = new PutObjectCommand({
-                    Bucket: "dopat-scavenger-hunt",
-                    Key: `${name}/checklist.json`,
-                    Body: JSON.stringify(sendObject),
-                    ContentType: "application/json"
-                })
-
-                jsonUpdates.push(s3Client.send(updateUserJsonCommand))
             }
 
-            const responses = await Promise.allSettled([...body.photos.map((photo: Photo) => {
-
+            // upload all the photos
+            const responses = await Promise.allSettled(body.photos.map((photo: Photo, index: Number) => {
                 //Validate files
                 const file_extension = photo.name.slice(
                     ((photo.name.lastIndexOf('.') - 1) >>> 0) + 2
@@ -87,19 +78,30 @@ export default defineEventHandler(async (event) => {
 
                 const command = new PutObjectCommand({
                     Bucket: "dopat-scavenger-hunt",
-                    Key: `${task}/${name}/${photo.name}`,
+                    Key: `${task}/${username}/${photo.name}`,
                     Body: buf,
                     ContentEncoding: 'base64',
                     ContentType: 'image/jpeg'
                 });
 
+
                 updateUserJson(photo.name)
 
                 return s3Client.send(command)
-            }), ...jsonUpdates])
+            }))
 
 
-            return responses
+            // once all the photos are uploaded update remote userJson
+            const updateUserJsonCommand = new PutObjectCommand({
+                Bucket: "dopat-scavenger-hunt",
+                Key: `${username}/checklist.json`,
+                Body: JSON.stringify(sendObject),
+                ContentType: "application/json"
+            })
+
+            const userJsonResponse = await s3Client.send(updateUserJsonCommand)
+
+            return { responses, userJsonResponse }
         } catch (err) {
             return {
                 error: `${err}`
