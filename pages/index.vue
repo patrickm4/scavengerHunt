@@ -392,7 +392,7 @@ export default defineComponent({
           return;
         }
 
-        const errorUploads = response.filter((res: any) => {
+        let errorUploads = response.responses.filter((res: any) => {
           return res.status !== "fulfilled";
         });
 
