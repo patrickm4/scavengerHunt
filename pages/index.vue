@@ -103,7 +103,7 @@
               }, 'ml-2'"
               class="cursor-pointer"
               @click="selectedTask = 'general'">
-              or go ahead and upload any picture!
+              or upload any picture!
             </span></div>
       </div>
 
@@ -115,7 +115,7 @@
         <input
           type="file"
           class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
-          :multiple="selectedTask ? null : true"
+          :multiple="selectedTask && selectedTask !== 'general' ? null : true"
           ref="fileupload"
           accept="image/*"
           @change="setPhoto($event)"
