@@ -27,15 +27,9 @@
       Welcome to Dorothy and Patrick's
     </p>
 
-    <!-- UNCOMMENT AFTER THAI WEDDING -->
-    <!-- <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
-      Wedding scavenger photo hunt at Sage!
-    </h1>     -->
-
-    <!-- REMOVE AFTER THAI WEDDING -->
     <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
-      Thai wedding ceremony!
-    </h1>
+      Wedding scavenger photo hunt at Sage!
+    </h1>    
 
     <p  v-if="!doesNeedsName" class="mt-6 text-xl leading-8 text-gray-700">
       Upload your photos here!
@@ -53,8 +47,7 @@
     </template>
 
     <template v-else-if="!doesNeedsName && fullName">
-      <!-- UNCOMMENT AFTER THAI WEDDING -->
-      <!-- <p class="mt-6 text-xl leading-8 text-gray-700">
+      <p class="mt-6 text-xl leading-8 text-gray-700">
         Step 1:
       </p>
       <div class="mt-2">
@@ -110,24 +103,19 @@
               }, 'ml-2'"
               class="cursor-pointer"
               @click="selectedTask = 'general'">
-              or go ahead and upload any picture!
+              or upload any picture!
             </span></div>
-      </div> -->
-
-      <!-- UNCOMMENT AFTER THAI WEDDING -->
-      <!-- <p class="mt-4 text-xl leading-8 text-gray-700">
-        Step 2:
-      </p> -->
+      </div>
 
       <p class="mt-4 text-xl leading-8 text-gray-700">
-        Step 1:
+        Step 2:
       </p>
 
       <div class="mt-2">
         <input
           type="file"
           class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
-          :multiple="selectedTask ? null : true"
+          :multiple="selectedTask && selectedTask !== 'general' ? null : true"
           ref="fileupload"
           accept="image/*"
           @change="setPhoto($event)"
@@ -172,12 +160,8 @@
           </div>
         </div>
 
-        <!-- UNCOMMENT AFTER THAI WEDDING -->
-        <!-- <p class="mt-8 text-xl leading-8 text-gray-700">
-          Step 3:
-        </p> -->
         <p class="mt-8 text-xl leading-8 text-gray-700">
-          Step 2:
+          Step 3:
         </p>
 
         <button
