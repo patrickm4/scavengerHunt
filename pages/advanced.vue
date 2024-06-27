@@ -14,16 +14,16 @@
     </p>
     <!-- TODO click Categories title to go to display page and show ALL photos, perfect for a slide show -->
     <p class="mt-6 text-xl leading-8 text-gray-700">
-      Categories
+      Categories <button>Slide Show</button> 
     </p>
     <!-- TODO open a new page, pass val in and display photos there -->
     <div v-for="[key, val] in categoryList">
       <p class="mt-2">
         {{ key }}
       </p>
-      <div>
+      <!-- <div>
         {{val}}
-      </div>
+      </div> -->
     </div>
 
     <p class="mt-8 text-xl leading-8 text-gray-700">
