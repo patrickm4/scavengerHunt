@@ -245,6 +245,16 @@ export default defineComponent({
       return this.photos.length === this.filesLength;
     },
   },
+  watch: {
+    selectedTask: {
+      handler: function (newVal) {
+        if (newVal !== 'general' && this.photos.length > 1) {
+          this.photos = [this.photos[0]]
+          this.filesLength = 1
+        }
+      },
+    },
+  },
   methods: {
     deleteDraftPhoto(photoName) {
       this.photos = this.photos.filter((photo) => photo.name !== photoName.name);
@@ -259,7 +269,7 @@ export default defineComponent({
         }
       );
 
-      console.log("check get user", response);
+      // console.log("check get user", response);
 
       this.userJSON = response;
 
@@ -308,6 +318,7 @@ export default defineComponent({
       }
     },
     showAlert(msg: string, type: string, duration: number) {
+      // TODO need to put this inside alert component and have multiple alerts rendered instead of one alert changing.
       this.alert.message = msg;
       this.alert.type = type;
       this.alert.isShowing = true;
