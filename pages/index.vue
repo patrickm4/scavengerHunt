@@ -27,15 +27,9 @@
       Welcome to Dorothy and Patrick's
     </p>
 
-    <!-- UNCOMMENT AFTER THAI WEDDING -->
-    <!-- <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
-      Wedding scavenger photo hunt at Sage!
-    </h1>     -->
-
-    <!-- REMOVE AFTER THAI WEDDING -->
     <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
-      Thai wedding ceremony!
-    </h1>
+      Wedding scavenger photo hunt at Sage!
+    </h1>    
 
     <p  v-if="!doesNeedsName" class="mt-6 text-xl leading-8 text-gray-700">
       Upload your photos here!
@@ -53,8 +47,7 @@
     </template>
 
     <template v-else-if="!doesNeedsName && fullName">
-      <!-- UNCOMMENT AFTER THAI WEDDING -->
-      <!-- <p class="mt-6 text-xl leading-8 text-gray-700">
+      <p class="mt-6 text-xl leading-8 text-gray-700">
         Step 1:
       </p>
       <div class="mt-2">
@@ -112,15 +105,10 @@
               @click="selectedTask = 'general'">
               or go ahead and upload any picture!
             </span></div>
-      </div> -->
-
-      <!-- UNCOMMENT AFTER THAI WEDDING -->
-      <!-- <p class="mt-4 text-xl leading-8 text-gray-700">
-        Step 2:
-      </p> -->
+      </div>
 
       <p class="mt-4 text-xl leading-8 text-gray-700">
-        Step 1:
+        Step 2:
       </p>
 
       <div class="mt-2">
@@ -172,12 +160,8 @@
           </div>
         </div>
 
-        <!-- UNCOMMENT AFTER THAI WEDDING -->
-        <!-- <p class="mt-8 text-xl leading-8 text-gray-700">
-          Step 3:
-        </p> -->
         <p class="mt-8 text-xl leading-8 text-gray-700">
-          Step 2:
+          Step 3:
         </p>
 
         <button
