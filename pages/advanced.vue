@@ -5,22 +5,26 @@
     </p>
 
     <p class="mt-6 text-xl leading-8 text-gray-200">
-      First to finish: {{ whoFinishedFirst?.name }}
+      First to finish: {{ listOfWhoFinishedAscending[0]?.name }}
+    </p>
+
+    <p class="mt-2 text-xl leading-8 text-gray-200">
+      Runner ups
+        <div v-for="(userObj, index) in listOfWhoFinishedAscending">
+          <span v-if="index !== 0">
+            {{ `${index + 1}nd` }} - {{ userObj.name }}
+          </span>
+        </div>
     </p>
     <!-- TODO click Categories title to go to display page and show ALL photos, perfect for a slide show -->
     <p class="mt-6 text-xl leading-8 text-gray-200">
       Categories 
       <!-- <button>Slide Show</button>  -->
     </p>
-    <!-- TODO open a new page, pass val in and display photos there -->
     <div v-for="[key, val] in categoryList">
       <div class="mt-2">
         <span class="cursor-pointer" @click="showPhotos(key)">{{ key }} {{ val.length }}</span>
       </div>
-      <!-- show and paginate photos -->
-      <!-- <div>
-        {{val}}
-      </div> -->
     </div>
 
     <div v-if="categoryCurrentlyPreviewing" class="mt-5">
@@ -49,7 +53,7 @@
     </p>
     <div v-if="users?.length > 0">
       <div v-for="user in users">
-        <div class="flex justify-between items-center mt-5">
+        <div class="flex justify-between items-center mt-4">
           <div class="flex items-start flex-col">
             <div class="text-base font-semibold leading-7 text-blue-300">
               <NuxtLink :to="{ name: 'galleries', query: { fullName: user.name} }">{{user.name}}</NuxtLink>
@@ -62,7 +66,7 @@
               general photos uploaded: {{ user.general?.length || 0 }}
             </div>
             <div v-if="user.completedBy" class="ml-3">
-              {{new Date(user.completedBy)}}
+              Finished scavenger hunt at {{new Date(user.completedBy)}}
             </div>
           </div>
         </div>
@@ -125,20 +129,14 @@ export default defineComponent({
         return acc
       }, new Map())
     },
-    whoFinishedFirst () {
+    listOfWhoFinishedAscending () {
       return this.users.reduce((acc, cur) => {
         if (Object.entries(cur.completedTasks).length === 12) {
-          if (!acc) {
-            acc = cur
-          } else {
-            if (cur.completedBy < acc.completedBy) {
-              acc = cur
-            }
-          }
+          acc.push(cur)
         }
         return acc
-      }, null)
-    }
+      }, []).sort((a, b) => a.completedBy - b.completedBy)
+    },
   },
   methods: {
     resetShowing() {
@@ -151,7 +149,6 @@ export default defineComponent({
       this.categoryCurrentlyPreviewing = categoryKey
 
       this.currentlyShowingPhotos = this.categoryList.get(categoryKey).slice(0, 10)
-      // set currentlyShowingPhotos to photos
     },
     nextPage() {
       if(this.isShowingPhotos) {
