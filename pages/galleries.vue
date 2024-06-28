@@ -9,7 +9,7 @@
     <div @click="$router.go(-1)">Back</div>
     <div class="mt-5">
       <p class="mt-6 text-xl leading-8 text-gray-700">
-        Scavenger hunt photos {{ `${Object.keys(completedTasks)?.length || 0}/12` }}
+        Scavenger hunt photos {{ `(${Object.keys(completedTasks)?.length || 0}/12)` }}
       </p>
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="isShowingCompletedTasks = !isShowingCompletedTasks">
         {{ isShowingCompletedTasks ? 'Hide' : 'Show'}} scavenger hunt photos
@@ -29,7 +29,7 @@
     </div>
     <div class="mt-5">
       <p class="mt-6 text-xl leading-8 text-gray-700">
-        General photos {{ generalPhotos?.length || 0 }}
+        General photos ({{ generalPhotos?.length || 0 }})
       </p>
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-7" @click="isShowingGeneralPhotos = !isShowingGeneralPhotos">
         {{ isShowingGeneralPhotos ? 'Hide' : 'Show'}}  general photos
@@ -71,7 +71,7 @@ export default defineComponent({
         message: '',
         type: 'info',
       },
-      completedTasks: null,
+      completedTasks: {},
       generalPhotos: [],
       currentlyShowingGeneralPhotos: [],// this will have at most 10 photos showing at a time, test with 5 at a time
       startPhotoIndex: 0,
