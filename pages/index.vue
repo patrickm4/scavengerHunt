@@ -23,17 +23,30 @@
         </div>
       </div>
     </div>
-    <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">
-      Welcome to Dorothy and Patrick's
-    </p>
 
-    <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
-      Wedding scavenger photo hunt at Sage!
-    </h1>    
-
-    <p  v-if="!doesNeedsName" class="mt-6 text-xl leading-8 text-gray-700">
-      Upload your photos here!
-    </p>
+    <template v-if="doesNeedsName">
+      <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">
+        Welcome to Dorothy and Patrick's
+      </p>
+  
+      <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
+        Wedding scavenger photo hunt at Sage!
+      </h1>    
+    </template>
+    <template v-else>
+      <h1 class="mt-6 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
+        Dorothy and Patrick's wedding scavenger photo hunt
+      </h1>    
+      <!-- <p class="mt-2 text-xl leading-8 text-gray-700">
+        Upload your photos here!
+      </p> -->
+      <p class="mt-2 text-xl leading-8 text-gray-700">
+        Select a category you want to upload a photo for, then choose a photo from your album or take a picture, then press submit!
+      </p>
+      <p class="mt-2 text-base leading-8 text-gray-700">
+        If you just want to upload photos, pick the "or upload any picture!" option.
+      </p>
+    </template>
 
     <template v-if="doesNeedsName">
       <FullNameInput v-model:fullName="fullName" @saveName="saveName" @getNameBack="getNameBack" :isMutable="allowLocalStorageMutate"/>
@@ -47,6 +60,14 @@
     </template>
 
     <template v-else-if="!doesNeedsName && fullName">
+      <!-- <div class="mt-6">
+        <svg fill="#000000" height="50px" width="35px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+        viewBox="0 0 330 330" xml:space="preserve">
+        <path id="XMLID_24_" d="M216.358,271.76c-2.322-5.605-7.792-9.26-13.858-9.26H180V15c0-8.284-6.716-15-15-15
+          c-8.284,0-15,6.716-15,15v247.5h-22.5c-6.067,0-11.537,3.655-13.858,9.26c-2.321,5.605-1.038,12.057,3.252,16.347l37.5,37.5
+          C157.322,328.536,161.161,330,165,330s7.678-1.464,10.607-4.394l37.5-37.5C217.396,283.816,218.68,277.365,216.358,271.76z"/>
+        </svg>
+      </div> -->
       <p class="mt-6 text-xl leading-8 text-gray-700">
         Step 1:
       </p>
@@ -103,7 +124,7 @@
               }, 'ml-2'"
               class="cursor-pointer"
               @click="selectedTask = 'general'">
-              or upload any picture!
+              or upload any picture! (Multiple photos allowed)
             </span></div>
       </div>
 
