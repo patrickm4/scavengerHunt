@@ -1,10 +1,15 @@
 <template>
   <div div class="px-10 mt-8">
     <Alert :show="alert.isShowing" :message="alert.message" :type="alert.type"/>
+    <PreviewModal
+      v-if="photoToInspect"
+      :photo="photoToInspect"
+      @clearPhotoInspect="photoToInspect = null"
+    />
     <div @click="$router.go(-1)">Back</div>
     <div class="mt-5">
       <p class="mt-6 text-xl leading-8 text-gray-700">
-        Scavenger hunt photos
+        Scavenger hunt photos {{ `(${Object.keys(completedTasks)?.length || 0}/12)` }}
       </p>
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="isShowingCompletedTasks = !isShowingCompletedTasks">
         {{ isShowingCompletedTasks ? 'Hide' : 'Show'}} scavenger hunt photos
@@ -14,13 +19,17 @@
           <p class="mt-6 text-xl leading-8 text-gray-700">
             {{ hyphenToTitleCase(key) }}
           </p>
-          <img :src="`https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${value}`" />
+          <!-- TODO change fileb64String to something more appropriate -->
+          <img :src="`https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${value}`" @click="photoToInspect = {
+            fileb64String: `https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${value}`,
+            href: `https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${value}`
+          }" />
         </div>
       </div>
     </div>
     <div class="mt-5">
       <p class="mt-6 text-xl leading-8 text-gray-700">
-        General photos
+        General photos ({{ generalPhotos?.length || 0 }})
       </p>
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-7" @click="isShowingGeneralPhotos = !isShowingGeneralPhotos">
         {{ isShowingGeneralPhotos ? 'Hide' : 'Show'}}  general photos
@@ -28,14 +37,18 @@
       <div v-if="!generalPhotos && isShowingGeneralPhotos">No general photos uploaded</div>
       <div v-else-if="generalPhotos && isShowingGeneralPhotos">
         <div class="mb-2" v-for="photo in currentlyShowingGeneralPhotos">
-          <img :src="`https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${photo}`" />
+          <!-- TODO change fileb64String to something more appropriate -->
+          <img :src="`https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${photo}`" @click="photoToInspect = {
+            fileb64String: `https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${photo}`,
+            href: `https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${photo}`
+          }" />
         </div>
         <div class="flex justify-between my-7">
           <button v-if="startPhotoIndex <= 0" class="bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">
             Previous
           </button>
           <button v-else class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"  @click="previousPage">Previous</button>
-          <button v-if="endPhotoIndex >= generalPhotos.length - 1" class="bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">
+          <button v-if="endPhotoIndex >= generalPhotos.length" class="bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">
             Next
           </button>
           <button v-else class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"  @click="nextPage">Next</button>
@@ -58,13 +71,14 @@ export default defineComponent({
         message: '',
         type: 'info',
       },
-      completedTasks: null,
+      completedTasks: {},
       generalPhotos: [],
       currentlyShowingGeneralPhotos: [],// this will have at most 10 photos showing at a time, test with 5 at a time
       startPhotoIndex: 0,
-      endPhotoIndex: 5,
+      endPhotoIndex: 10,
       isShowingGeneralPhotos: false,
       isShowingCompletedTasks: false,
+      photoToInspect: null
     };
   },
   async mounted () {
@@ -80,22 +94,22 @@ export default defineComponent({
         }
       );
 
-      console.log("check gallery response", response)
-
       this.completedTasks = response.completedTasks;
       this.generalPhotos = response.general;
-      this.currentlyShowingGeneralPhotos = this.generalPhotos.slice(0, 5);
+      if (this.generalPhotos?.length > 0) {
+        this.currentlyShowingGeneralPhotos = this.generalPhotos.slice(0, 10);
+      }
     }
   },
   methods: {
     nextPage() {
-      this.startPhotoIndex = this.startPhotoIndex + 5;
-      this.endPhotoIndex = this.endPhotoIndex + 5;
+      this.startPhotoIndex = this.startPhotoIndex + 10;
+      this.endPhotoIndex = this.endPhotoIndex + 10;
       this.currentlyShowingGeneralPhotos = this.generalPhotos.slice(this.startPhotoIndex, this.endPhotoIndex);
     },
     previousPage() {
-      this.startPhotoIndex = this.startPhotoIndex - 5 < 0 ? 0 : this.startPhotoIndex - 5;
-      this.endPhotoIndex = this.endPhotoIndex - 5 < 0 ? 5 : this.endPhotoIndex - 5;
+      this.startPhotoIndex = this.startPhotoIndex - 10 < 0 ? 0 : this.startPhotoIndex - 10;
+      this.endPhotoIndex = this.endPhotoIndex - 10 < 0 ? 10 : this.endPhotoIndex - 10;
       this.currentlyShowingGeneralPhotos = this.generalPhotos.slice(this.startPhotoIndex, this.endPhotoIndex);
     },
     hyphenToTitleCase(input: string): string {

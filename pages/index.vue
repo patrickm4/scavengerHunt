@@ -36,7 +36,7 @@
     </p>
 
     <template v-if="doesNeedsName">
-      <FullNameInput v-model:fullName="fullName" @saveName="saveName" />
+      <FullNameInput v-model:fullName="fullName" @saveName="saveName" @getNameBack="getNameBack" :isMutable="allowLocalStorageMutate"/>
       <button
         type="button"
         class="mt-8 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30"
@@ -227,7 +227,8 @@ export default defineComponent({
       ],
       objectives: [],
       selectedTask: "",
-      isUserMenuOpen: false
+      isUserMenuOpen: false,
+      allowLocalStorageMutate: false
     };
   },
   async mounted() {
@@ -245,6 +246,16 @@ export default defineComponent({
       return this.photos.length === this.filesLength;
     },
   },
+  watch: {
+    selectedTask: {
+      handler: function (newVal) {
+        if (newVal !== 'general' && this.photos.length > 1) {
+          this.photos = [this.photos[0]]
+          this.filesLength = 1
+        }
+      },
+    },
+  },
   methods: {
     deleteDraftPhoto(photoName) {
       this.photos = this.photos.filter((photo) => photo.name !== photoName.name);
@@ -259,7 +270,7 @@ export default defineComponent({
         }
       );
 
-      console.log("check get user", response);
+      // console.log("check get user", response);
 
       this.userJSON = response;
 
@@ -288,26 +299,54 @@ export default defineComponent({
         return "";
       }
     },
-    async saveName() {
-      localStorage.setItem("name", this.fullName);
+    getNameBack() {
+      this.allowLocalStorageMutate = false;
       this.doesNeedsName = false;
-      // create a JSON for them under name/checklist
-      const response = await $fetch("/api/aws/user/s3", {
-        method: "POST",
-        body: {
-          name: this.fullName,
-        },
-      });
-
-      if (response.ok) {
-        this.userJSON = response.userJson;
-      } else {
-        // need to try entering the name again
-        this.doesNeedsName = true;
-        this.showAlert(`Error setting up name - refresh and try again`, "danger");
+      this.fetchUserJson()
+    },
+    async saveName() {
+      if (this.fullName === '' || this.fullName.trim().length === 0) {
+        this.showAlert("Please enter your name", "warning");
+        return;
       }
+
+      if (this.fullName === 'changelocalstorage') {
+        // in case there is an issue with the names
+        localStorage.removeItem("name");
+        this.fullName = ''
+        this.allowLocalStorageMutate = true;
+
+        return
+      }
+
+      let response = null;
+
+      if (!this.allowLocalStorageMutate) {
+        // create a JSON for them under name/checklist
+        response = await $fetch("/api/aws/user/s3", {
+          method: "POST",
+          body: {
+            name: this.fullName,
+          },
+        });
+
+        if (response.ok) {
+          this.userJSON = response.userJson;
+        } else {
+          // need to try entering the name again
+          this.doesNeedsName = true;
+          this.showAlert(`Error setting up name - refresh and try again`, "danger");
+        }
+      } else {
+        this.fetchUserJson()
+        this.allowLocalStorageMutate = false;
+      }
+
+      localStorage.setItem("name", this.fullName);
+      this.doesNeedsName = false;      
     },
     showAlert(msg: string, type: string, duration: number) {
+      // TODO need to put this inside alert component and have multiple alerts rendered instead of one alert changing.
       this.alert.message = msg;
       this.alert.type = type;
       this.alert.isShowing = true;

@@ -1,6 +1,7 @@
 <template>
   <div class="mt-5">
-    <label>Enter your full name to start</label>
+    <div v-if="isMutable">Changing Local storage</div>
+    <label v-else>Enter your full name to start</label>
     <input
       :value="fullName"
       @input="$emit('update:fullName', $event.target.value)"
@@ -17,6 +18,7 @@
 export default {
   props: {
     fullName: String,
+    isMutable: Boolean,
   },
   emits: ["update:fullName"],
 };

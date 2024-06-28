@@ -1,39 +1,57 @@
 <template>
-  <div div class="px-10 mt-8">
-    <Alert
-      :show="alert?.isShowing"
-      :message="alert?.message"
-      :type="alert?.type"
-    />
-    <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">
+  <div div class="px-10 bg-gray-900 text-white">
+    <p class="text-lg font-semibold leading-7 text-white pt-10">
       See scavenger hunt progress
     </p>
 
-    <p class="mt-6 text-xl leading-8 text-gray-700">
+    <p class="mt-6 text-xl leading-8 text-gray-200">
       First to finish: {{ whoFinishedFirst?.name }}
     </p>
     <!-- TODO click Categories title to go to display page and show ALL photos, perfect for a slide show -->
-    <p class="mt-6 text-xl leading-8 text-gray-700">
-      Categories <button>Slide Show</button> 
+    <p class="mt-6 text-xl leading-8 text-gray-200">
+      Categories 
+      <!-- <button>Slide Show</button>  -->
     </p>
     <!-- TODO open a new page, pass val in and display photos there -->
     <div v-for="[key, val] in categoryList">
-      <p class="mt-2">
-        {{ key }}
-      </p>
+      <div class="mt-2">
+        <span class="cursor-pointer" @click="showPhotos(key)">{{ key }} {{ val.length }}</span>
+      </div>
+      <!-- show and paginate photos -->
       <!-- <div>
         {{val}}
       </div> -->
     </div>
 
-    <p class="mt-8 text-xl leading-8 text-gray-700">
+    <div v-if="categoryCurrentlyPreviewing" class="mt-5">
+      Showing {{ categoryCurrentlyPreviewing.replace(/-/g, ' ') }} 
+      <button @click="resetShowing">Close showing</button>
+    </div>
+
+    <div class="img-container">
+      <div v-for="photo in currentlyShowingPhotos" class="mt-2">
+        <img :src="`https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${photo[Object.keys(photo)[0]]}`" class="category-img"/>
+      </div>
+      <div v-if="isShowingPhotos" class="flex justify-between w-1/2 my-7">
+        <button v-if="startPhotoIndex <= 0" class="bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">
+          Previous
+        </button>
+        <button v-else class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"  @click="previousPage">Previous</button>
+        <button v-if="endPhotoIndex > currentlyShowingPhotos.length" class="bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">
+          Next
+        </button>
+        <button v-else class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"  @click="nextPage">Next</button>
+      </div>
+    </div>
+
+    <p class="mt-8 text-xl leading-8 text-gray-200">
       Guests
     </p>
     <div v-if="users?.length > 0">
       <div v-for="user in users">
         <div class="flex justify-between items-center mt-5">
           <div class="flex items-start flex-col">
-            <div class="text-base font-semibold leading-7 text-yellow-900">
+            <div class="text-base font-semibold leading-7 text-blue-300">
               <NuxtLink :to="{ name: 'galleries', query: { fullName: user.name} }">{{user.name}}</NuxtLink>
             </div>
             <div class="ml-3">
@@ -63,6 +81,10 @@ export default defineComponent({
       users: [],
       alert: {},
       selectedUserToShowHuntPhotos: null,
+      currentlyShowingPhotos: [],
+      startPhotoIndex: 0,
+      endPhotoIndex: 10,
+      categoryCurrentlyPreviewing: null,
     };
   },
   async mounted () {
@@ -75,7 +97,6 @@ export default defineComponent({
         }
       );
 
-      console.log("advanced response", response)
       this.users = response.reduce((acc, obj)=> {
         if (obj.status !== 'fulfilled') return acc
 
@@ -85,6 +106,9 @@ export default defineComponent({
       },[])
   },
   computed: {
+    isShowingPhotos () {
+      return this.categoryCurrentlyPreviewing && this.currentlyShowingPhotos?.length > 0
+    },
     categoryList () {
       // iterate through users completedTasks add each key to a new map, with name and key
       return this.users.reduce((acc, cur) => {
@@ -115,6 +139,49 @@ export default defineComponent({
         return acc
       }, null)
     }
+  },
+  methods: {
+    resetShowing() {
+      this.categoryCurrentlyPreviewing = null
+      this.currentlyShowingPhotos = []
+      this.startPhotoIndex = 0
+      this.endPhotoIndex = 10
+    },
+    showPhotos(categoryKey: string) {
+      this.categoryCurrentlyPreviewing = categoryKey
+
+      this.currentlyShowingPhotos = this.categoryList.get(categoryKey).slice(0, 10)
+      // set currentlyShowingPhotos to photos
+    },
+    nextPage() {
+      if(this.isShowingPhotos) {
+        this.startPhotoIndex = this.startPhotoIndex + 10;
+        this.endPhotoIndex = this.endPhotoIndex + 10;
+
+        this.currentlyShowingPhotos = this.categoryList.get(this.categoryCurrentlyPreviewing).slice(this.startPhotoIndex, this.endPhotoIndex);
+      }
+    },
+    previousPage() {
+      if(this.isShowingPhotos) {
+        this.startPhotoIndex = this.startPhotoIndex - 10 < 0 ? 0 : this.startPhotoIndex - 10;
+        this.endPhotoIndex = this.endPhotoIndex - 10 < 0 ? 10 : this.endPhotoIndex - 10;
+
+        this.currentlyShowingPhotos = this.categoryList.get(this.categoryCurrentlyPreviewing).slice(this.startPhotoIndex, this.endPhotoIndex);
+      }
+    },
   }
 });
 </script>
+
+<style>
+.category-img {
+  height:90vh;
+  width: auto
+}
+.img-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+</style>
