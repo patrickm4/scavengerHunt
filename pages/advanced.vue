@@ -18,12 +18,28 @@
     </p>
     <!-- TODO open a new page, pass val in and display photos there -->
     <div v-for="[key, val] in categoryList">
-      <p class="mt-2">
-        {{ key }}
+      <p class="mt-2" @click="showPhotos(key)">
+        {{ key }} {{ val.length }}
       </p>
+      <!-- show and paginate photos -->
       <!-- <div>
         {{val}}
       </div> -->
+    </div>
+
+    <div v-if="categoryCurrentlyPreviewing" class="mt-5">Showing {{ categoryCurrentlyPreviewing.replace(/-/g, ' ') }} <button @click="resetShowing">Close showing</button></div>
+    <div v-for="photo in currentlyShowingPhotos" class="mt-2">
+      <img :src="`https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${photo[Object.keys(photo)[0]]}`" />
+    </div>
+    <div v-if="isShowingPhotos" class="flex justify-between my-7">
+      <button v-if="startPhotoIndex <= 0" class="bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">
+        Previous
+      </button>
+      <button v-else class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"  @click="previousPage">Previous</button>
+      <button v-if="endPhotoIndex > currentlyShowingPhotos.length" class="bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">
+        Next
+      </button>
+      <button v-else class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"  @click="nextPage">Next</button>
     </div>
 
     <p class="mt-8 text-xl leading-8 text-gray-700">
@@ -63,6 +79,10 @@ export default defineComponent({
       users: [],
       alert: {},
       selectedUserToShowHuntPhotos: null,
+      currentlyShowingPhotos: [],
+      startPhotoIndex: 0,
+      endPhotoIndex: 10,
+      categoryCurrentlyPreviewing: null,
     };
   },
   async mounted () {
@@ -75,7 +95,6 @@ export default defineComponent({
         }
       );
 
-      console.log("advanced response", response)
       this.users = response.reduce((acc, obj)=> {
         if (obj.status !== 'fulfilled') return acc
 
@@ -85,6 +104,9 @@ export default defineComponent({
       },[])
   },
   computed: {
+    isShowingPhotos () {
+      return this.categoryCurrentlyPreviewing && this.currentlyShowingPhotos?.length > 0
+    },
     categoryList () {
       // iterate through users completedTasks add each key to a new map, with name and key
       return this.users.reduce((acc, cur) => {
@@ -115,6 +137,36 @@ export default defineComponent({
         return acc
       }, null)
     }
+  },
+  methods: {
+    resetShowing() {
+      this.categoryCurrentlyPreviewing = null
+      this.currentlyShowingPhotos = []
+      this.startPhotoIndex = 0
+      this.endPhotoIndex = 10
+    },
+    showPhotos(categoryKey: string) {
+      this.categoryCurrentlyPreviewing = categoryKey
+
+      this.currentlyShowingPhotos = this.categoryList.get(categoryKey).slice(0, 10)
+      // set currentlyShowingPhotos to photos
+    },
+    nextPage() {
+      if(this.isShowingPhotos) {
+        this.startPhotoIndex = this.startPhotoIndex + 10;
+        this.endPhotoIndex = this.endPhotoIndex + 10;
+
+        this.currentlyShowingPhotos = this.categoryList.get(this.categoryCurrentlyPreviewing).slice(this.startPhotoIndex, this.endPhotoIndex);
+      }
+    },
+    previousPage() {
+      if(this.isShowingPhotos) {
+        this.startPhotoIndex = this.startPhotoIndex - 10 < 0 ? 0 : this.startPhotoIndex - 10;
+        this.endPhotoIndex = this.endPhotoIndex - 10 < 0 ? 10 : this.endPhotoIndex - 10;
+
+        this.currentlyShowingPhotos = this.categoryList.get(this.categoryCurrentlyPreviewing).slice(this.startPhotoIndex, this.endPhotoIndex);
+      }
+    },
   }
 });
 </script>
