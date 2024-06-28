@@ -9,7 +9,7 @@
     <div @click="$router.go(-1)">Back</div>
     <div class="mt-5">
       <p class="mt-6 text-xl leading-8 text-gray-700">
-        Scavenger hunt photos
+        Scavenger hunt photos {{ `${Object.keys(completedTasks)?.length || 0}/12` }}
       </p>
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="isShowingCompletedTasks = !isShowingCompletedTasks">
         {{ isShowingCompletedTasks ? 'Hide' : 'Show'}} scavenger hunt photos
@@ -29,7 +29,7 @@
     </div>
     <div class="mt-5">
       <p class="mt-6 text-xl leading-8 text-gray-700">
-        General photos
+        General photos {{ generalPhotos?.length || 0 }}
       </p>
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-7" @click="isShowingGeneralPhotos = !isShowingGeneralPhotos">
         {{ isShowingGeneralPhotos ? 'Hide' : 'Show'}}  general photos
@@ -48,7 +48,7 @@
             Previous
           </button>
           <button v-else class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"  @click="previousPage">Previous</button>
-          <button v-if="endPhotoIndex >= generalPhotos.length - 1" class="bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">
+          <button v-if="endPhotoIndex >= generalPhotos.length" class="bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">
             Next
           </button>
           <button v-else class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"  @click="nextPage">Next</button>
@@ -75,7 +75,7 @@ export default defineComponent({
       generalPhotos: [],
       currentlyShowingGeneralPhotos: [],// this will have at most 10 photos showing at a time, test with 5 at a time
       startPhotoIndex: 0,
-      endPhotoIndex: 5,
+      endPhotoIndex: 10,
       isShowingGeneralPhotos: false,
       isShowingCompletedTasks: false,
       photoToInspect: null
@@ -94,22 +94,22 @@ export default defineComponent({
         }
       );
 
-      console.log("check gallery response", response)
-
       this.completedTasks = response.completedTasks;
       this.generalPhotos = response.general;
-      this.currentlyShowingGeneralPhotos = this.generalPhotos.slice(0, 5);
+      if (this.generalPhotos?.length > 0) {
+        this.currentlyShowingGeneralPhotos = this.generalPhotos.slice(0, 10);
+      }
     }
   },
   methods: {
     nextPage() {
-      this.startPhotoIndex = this.startPhotoIndex + 5;
-      this.endPhotoIndex = this.endPhotoIndex + 5;
+      this.startPhotoIndex = this.startPhotoIndex + 10;
+      this.endPhotoIndex = this.endPhotoIndex + 10;
       this.currentlyShowingGeneralPhotos = this.generalPhotos.slice(this.startPhotoIndex, this.endPhotoIndex);
     },
     previousPage() {
-      this.startPhotoIndex = this.startPhotoIndex - 5 < 0 ? 0 : this.startPhotoIndex - 5;
-      this.endPhotoIndex = this.endPhotoIndex - 5 < 0 ? 5 : this.endPhotoIndex - 5;
+      this.startPhotoIndex = this.startPhotoIndex - 10 < 0 ? 0 : this.startPhotoIndex - 10;
+      this.endPhotoIndex = this.endPhotoIndex - 10 < 0 ? 10 : this.endPhotoIndex - 10;
       this.currentlyShowingGeneralPhotos = this.generalPhotos.slice(this.startPhotoIndex, this.endPhotoIndex);
     },
     hyphenToTitleCase(input: string): string {
