@@ -11,20 +11,55 @@
       @clearPhotoInspect="previewPhotoToInspect = null"
     />
     <div class="flex justify-between">
-       <template v-if="!userJSON && !doesNeedsName">Loading...</template>
-       <template v-else-if="userJSON && !doesNeedsName">
-         <NuxtLink :to="{ name: 'galleries', query: { fullName } }">Your gallery</NuxtLink>
-       </template>
-      <div v-if="!doesNeedsName && fullName" class="cursor-pointer" @click="isUserMenuOpen = !isUserMenuOpen">Hi, {{ fullName }}</div>
-      <div v-if="isUserMenuOpen" class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none top-14" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-        <div class="py-1 mr-2" role="none">
-          <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
-          <button type="button" class="block w-full px-4 py-2 text-left text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-1" @click="changeName">Change name</button>
-        </div>
+      <template v-if="!userJSON && !doesNeedsName">Loading...</template>
+      <template v-else-if="userJSON && !doesNeedsName">
+        <NuxtLink :to="{ name: 'galleries', query: { fullName } }"
+          >Your gallery</NuxtLink
+        >
+      </template>
+      <div
+        v-if="!doesNeedsName && fullName"
+        class="cursor-pointer"
+        @click="isUserMenuOpen = !isUserMenuOpen"
+      >
+        Hi, {{ fullName }}
       </div>
+      <!-- <div
+        v-if="isUserMenuOpen"
+        class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none top-14"
+        role="menu"
+        aria-orientation="vertical"
+        aria-labelledby="menu-button"
+        tabindex="-1"
+      >
+        <div class="py-1 mr-2" role="none">
+          <button
+            type="button"
+            class="block w-full px-4 py-2 text-left text-sm text-gray-700"
+            role="menuitem"
+            tabindex="-1"
+            id="menu-item-1"
+            @click="changeName"
+          >
+            Change name
+          </button>
+        </div>
+      </div> -->
     </div>
 
-    <template v-if="doesNeedsName">
+    <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
+      Thank you everyone for playing the scavenger photo hunt at our wedding!
+    </h1>
+
+    <p class="mt-2 text-xl leading-8 text-gray-700">
+      For those looking for photo booth pictures, we'll try to have them up here
+      for download in the next couple of days.
+    </p>
+    <p class="mt-2 text-base leading-8 text-gray-700 float-right">
+      - Mr & Mrs Moreno
+    </p>
+
+    <!-- <template v-if="doesNeedsName">
       <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">
         Welcome to Dorothy and Patrick's
       </p>
@@ -36,10 +71,7 @@
     <template v-else>
       <h1 class="mt-6 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
         Dorothy and Patrick's wedding scavenger photo hunt
-      </h1>    
-      <!-- <p class="mt-2 text-xl leading-8 text-gray-700">
-        Upload your photos here!
-      </p> -->
+      </h1>
       <p class="mt-2 text-xl leading-8 text-gray-700">
         Select a category you want to upload a photo for, then choose a photo from your album or take a picture, then press submit!
       </p>
@@ -57,10 +89,11 @@
       >
         Enter
       </button>
-    </template>
+    </template> -->
 
-    <template v-else-if="!doesNeedsName && fullName">
-      <!-- <div class="mt-6">
+    <!-- <template v-else-if="!doesNeedsName && fullName"> -->
+    <!-- <template v-if="!doesNeedsName && fullName"> -->
+    <!-- <div class="mt-6">
         <svg fill="#000000" height="50px" width="35px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
         viewBox="0 0 330 330" xml:space="preserve">
         <path id="XMLID_24_" d="M216.358,271.76c-2.322-5.605-7.792-9.26-13.858-9.26H180V15c0-8.284-6.716-15-15-15
@@ -68,9 +101,7 @@
           C157.322,328.536,161.161,330,165,330s7.678-1.464,10.607-4.394l37.5-37.5C217.396,283.816,218.68,277.365,216.358,271.76z"/>
         </svg>
       </div> -->
-      <p class="mt-6 text-xl leading-8 text-gray-700">
-        Step 1:
-      </p>
+    <!-- <p class="mt-6 text-xl leading-8 text-gray-700">Step 1:</p>
       <div class="mt-2">
         <label
           for="email"
@@ -113,24 +144,28 @@
         </ul>
         <div class="mt-4">
           <input
-                id="general"
-                type="radio"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                v-model="selectedTask"
-                value="general"
-              />
-          <span :class="{
+            id="general"
+            type="radio"
+            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+            v-model="selectedTask"
+            value="general"
+          />
+          <span
+            :class="
+              ({
                 'text-gray-500': selectedTask && selectedTask !== 'general',
-              }, 'ml-2'"
-              class="cursor-pointer"
-              @click="selectedTask = 'general'">
-              or upload any picture! (Multiple photos allowed)
-            </span></div>
+              },
+              'ml-2')
+            "
+            class="cursor-pointer"
+            @click="selectedTask = 'general'"
+          >
+            or upload any picture! (Multiple photos allowed)
+          </span>
+        </div>
       </div>
 
-      <p class="mt-4 text-xl leading-8 text-gray-700">
-        Step 2:
-      </p>
+      <p class="mt-4 text-xl leading-8 text-gray-700">Step 2:</p>
 
       <div class="mt-2">
         <input
@@ -151,11 +186,7 @@
             loading
           </div>
           <div v-else class="flex thumbnail-container">
-            <div
-              v-for="photo in photos" 
-              :key="photo.name"
-              class="mr-4"
-            >
+            <div v-for="photo in photos" :key="photo.name" class="mr-4">
               <img
                 class="photo-thumbnail mr-2"
                 :src="photo.fileb64String"
@@ -169,21 +200,18 @@
                 class="mt-2 flex w-full justify-center rounded-md bg-red-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
                 @click="deleteDraftPhoto(photo)"
               >
-                <!-- <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div> -->
                 Remove
               </button>
-            </div>
-            <!-- <a v-if="photo.href" :href="photo.href" class="mt-5 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30" download>
+            </div> -->
+    <!-- <a v-if="photo.href" :href="photo.href" class="mt-5 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30" download>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
               </svg>
             </a> -->
-          </div>
-        </div>
+    <!-- </div>
+        </div> -->
 
-        <p class="mt-8 text-xl leading-8 text-gray-700">
-          Step 3:
-        </p>
+    <!-- <p class="mt-8 text-xl leading-8 text-gray-700">Step 3:</p>
 
         <button
           type="button"
@@ -192,13 +220,13 @@
         >
           <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div>
           Submit
-        </button>
+        </button> -->
 
-        <div>
+    <!-- <div>
           {{ seeResponse }}
-        </div>
-      </div>
-    </template>
+        </div> -->
+    <!-- </div>
+    </template> -->
   </div>
 </template>
 
@@ -249,15 +277,15 @@ export default defineComponent({
       objectives: [],
       selectedTask: "",
       isUserMenuOpen: false,
-      allowLocalStorageMutate: false
+      allowLocalStorageMutate: false,
     };
   },
   async mounted() {
     const name = localStorage.getItem("name");
     if (name) {
       this.fullName = name;
-      
-      this.fetchUserJson()
+
+      this.fetchUserJson();
     } else {
       this.doesNeedsName = true;
     }
@@ -270,17 +298,19 @@ export default defineComponent({
   watch: {
     selectedTask: {
       handler: function (newVal) {
-        if (newVal !== 'general' && this.photos.length > 1) {
-          this.photos = [this.photos[0]]
-          this.filesLength = 1
+        if (newVal !== "general" && this.photos.length > 1) {
+          this.photos = [this.photos[0]];
+          this.filesLength = 1;
         }
       },
     },
   },
   methods: {
     deleteDraftPhoto(photoName) {
-      this.photos = this.photos.filter((photo) => photo.name !== photoName.name);
-      this.filesLength--
+      this.photos = this.photos.filter(
+        (photo) => photo.name !== photoName.name
+      );
+      this.filesLength--;
     },
     async fetchUserJson() {
       // fetch their checklist
@@ -296,17 +326,17 @@ export default defineComponent({
       this.userJSON = response;
 
       if (this.userJSON.completedTasks) {
-        this.completedItems = Object.keys(
-          this.userJSON.completedTasks
-        ).map((task: string) => task.replace(/-/g, " "));
+        this.completedItems = Object.keys(this.userJSON.completedTasks).map(
+          (task: string) => task.replace(/-/g, " ")
+        );
       }
     },
     changeName() {
-      this.fullName = ''
+      this.fullName = "";
       localStorage.removeItem("name");
-      this.isUserMenuOpen = false
+      this.isUserMenuOpen = false;
       // clear the completed, TODO maybe we should grab the userJSON again and fulfill the completedItems. This way online one person is using that name?
-      this.completedItems = []
+      this.completedItems = [];
       this.doesNeedsName = true;
     },
     completedStyle(task: string) {
@@ -323,21 +353,21 @@ export default defineComponent({
     getNameBack() {
       this.allowLocalStorageMutate = false;
       this.doesNeedsName = false;
-      this.fetchUserJson()
+      this.fetchUserJson();
     },
     async saveName() {
-      if (this.fullName === '' || this.fullName.trim().length === 0) {
+      if (this.fullName === "" || this.fullName.trim().length === 0) {
         this.showAlert("Please enter your name", "warning");
         return;
       }
 
-      if (this.fullName === 'changelocalstorage') {
+      if (this.fullName === "changelocalstorage") {
         // in case there is an issue with the names
         localStorage.removeItem("name");
-        this.fullName = ''
+        this.fullName = "";
         this.allowLocalStorageMutate = true;
 
-        return
+        return;
       }
 
       let response = null;
@@ -356,15 +386,18 @@ export default defineComponent({
         } else {
           // need to try entering the name again
           this.doesNeedsName = true;
-          this.showAlert(`Error setting up name - refresh and try again`, "danger");
+          this.showAlert(
+            `Error setting up name - refresh and try again`,
+            "danger"
+          );
         }
       } else {
-        this.fetchUserJson()
+        this.fetchUserJson();
         this.allowLocalStorageMutate = false;
       }
 
       localStorage.setItem("name", this.fullName);
-      this.doesNeedsName = false;      
+      this.doesNeedsName = false;
     },
     showAlert(msg: string, type: string, duration: number) {
       // TODO need to put this inside alert component and have multiple alerts rendered instead of one alert changing.
