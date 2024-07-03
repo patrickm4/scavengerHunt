@@ -165,18 +165,18 @@
         </div>
       </div>
 
-      <p class="mt-4 text-xl leading-8 text-gray-700">Step 2:</p>
+      <p class="mt-4 text-xl leading-8 text-gray-700">Step 2:</p>  -->
 
       <div class="mt-2">
+        <!-- :multiple="selectedTask && selectedTask !== 'general' ? null : true" -->
         <input
           type="file"
           class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
-          :multiple="selectedTask && selectedTask !== 'general' ? null : true"
           ref="fileupload"
+          mulitple
           accept="image/*"
           @change="setPhoto($event)"
         />
-
         <div v-if="photos?.length > 0" class="mt-4">
           <div
             v-if="!isPhotosFinishedLoading"
@@ -202,16 +202,17 @@
               >
                 Remove
               </button>
-            </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
     <!-- <a v-if="photo.href" :href="photo.href" class="mt-5 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30" download>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
               </svg>
             </a> -->
-    <!-- </div>
-        </div> -->
 
-    <!-- <p class="mt-8 text-xl leading-8 text-gray-700">Step 3:</p>
+    <!-- <p class="mt-8 text-xl leading-8 text-gray-700">Step 3:</p> -->
 
         <button
           type="button"
@@ -220,7 +221,7 @@
         >
           <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div>
           Submit
-        </button> -->
+        </button>
 
     <!-- <div>
           {{ seeResponse }}
@@ -447,17 +448,23 @@ export default defineComponent({
       this.isSubmitting = true;
 
       if (this.photos?.length > 0) {
-        const response = await $fetch("/api/aws/s3", {
+        // const response = await $fetch("/api/aws/s3", {
+        //   method: "POST",
+        //   body: {
+        //     photos: this.photos,
+        //     name: this.fullName,
+        //     task: this.selectedTask,
+        //     userJson: this.userJSON,
+        //   },
+        // });
+        const response = await $fetch("/api/aws/photoDump/s3", {
           method: "POST",
           body: {
             photos: this.photos,
-            name: this.fullName,
-            task: this.selectedTask,
-            userJson: this.userJSON,
           },
         });
 
-        console.log("s3 response", response);
+        console.log("s3 photo dump response", response);
 
         if (response?.error) {
           this.photos = [];
@@ -491,9 +498,9 @@ export default defineComponent({
             `Uploaded ${photoCount} photo${photoCount > 1 ? "s" : ""}`,
             "success"
           );
-          this.completedItems.push(this.selectedTask);
+          // this.completedItems.push(this.selectedTask);
           this.$refs.fileupload.value = "";
-          this.selectedTask = "";
+          // this.selectedTask = "";
           this.isSubmitting = false;
         }
       } else {
