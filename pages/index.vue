@@ -48,16 +48,10 @@
     </div>
 
     <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
-      Thank you everyone for playing the scavenger photo hunt at our wedding!
+      Thank you everyone for playing the scavenger photo hunt* and using the photo booth at our wedding!
     </h1>
 
-    <p class="mt-2 text-xl leading-8 text-gray-700">
-      For those looking for photo booth pictures, we'll try to have them up here
-      for download in the next couple of days.
-    </p>
-    <p class="mt-2 text-base leading-8 text-gray-700 float-right">
-      - Mr & Mrs Moreno
-    </p>
+    
 
     <!-- <template v-if="doesNeedsName">
       <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">
@@ -165,18 +159,27 @@
         </div>
       </div>
 
-      <p class="mt-4 text-xl leading-8 text-gray-700">Step 2:</p>
+      <p class="mt-4 text-xl leading-8 text-gray-700">Step 2:</p>  -->
 
-      <div class="mt-2">
+      <div class="mt-6">
+        <NuxtLink class="text-blue-500" :to="{ name: 'photoBooth' }"
+          >View photo booth pictures</NuxtLink
+        >
+      </div>
+
+      <div class="mt-6">
+        <p class="mt-2 text-xl leading-8 text-gray-700">
+          Have some pictures from the wedding? Upload them below!
+        </p>
+        <!-- :multiple="selectedTask && selectedTask !== 'general' ? null : true" -->
         <input
           type="file"
-          class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
-          :multiple="selectedTask && selectedTask !== 'general' ? null : true"
+          class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100 mt-3"
           ref="fileupload"
+          multiple
           accept="image/*"
           @change="setPhoto($event)"
         />
-
         <div v-if="photos?.length > 0" class="mt-4">
           <div
             v-if="!isPhotosFinishedLoading"
@@ -197,30 +200,46 @@
               />
               <button
                 type="button"
-                class="mt-2 flex w-full justify-center rounded-md bg-red-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
+                class="mt-2 flex w-full justify-center rounded-md bg-gray-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
                 @click="deleteDraftPhoto(photo)"
               >
                 Remove
               </button>
-            </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
     <!-- <a v-if="photo.href" :href="photo.href" class="mt-5 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30" download>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
               </svg>
             </a> -->
-    <!-- </div>
-        </div> -->
 
-    <!-- <p class="mt-8 text-xl leading-8 text-gray-700">Step 3:</p>
+    <!-- <p class="mt-8 text-xl leading-8 text-gray-700">Step 3:</p> -->
 
         <button
           type="button"
-          class="mt-2 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
+          class="mt-8 flex w-full justify-center rounded-md bg-red-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
           @click="submit"
         >
           <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div>
           Submit
-        </button> -->
+        </button>
+
+        <hr>
+
+        
+        <p class="mt-5 text-base leading-8 text-gray-700">
+          <span class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">*</span> Winners to the photo hunt are:
+          <li>Genelie</li>
+          <li>Quinn</li>
+          <li>Justin Goldstein</li>
+          <p>We'll reach out to you guys when we can!</p>
+        </p>
+        <p class="mt-2 text-base leading-8 text-gray-700 float-right">
+          - Mr & Mrs Moreno
+        </p>
+
 
     <!-- <div>
           {{ seeResponse }}
@@ -447,17 +466,23 @@ export default defineComponent({
       this.isSubmitting = true;
 
       if (this.photos?.length > 0) {
-        const response = await $fetch("/api/aws/s3", {
+        // const response = await $fetch("/api/aws/s3", {
+        //   method: "POST",
+        //   body: {
+        //     photos: this.photos,
+        //     name: this.fullName,
+        //     task: this.selectedTask,
+        //     userJson: this.userJSON,
+        //   },
+        // });
+        const response = await $fetch("/api/aws/photoDump/s3", {
           method: "POST",
           body: {
             photos: this.photos,
-            name: this.fullName,
-            task: this.selectedTask,
-            userJson: this.userJSON,
           },
         });
 
-        console.log("s3 response", response);
+        console.log("s3 photo dump response", response);
 
         if (response?.error) {
           this.photos = [];
@@ -491,9 +516,9 @@ export default defineComponent({
             `Uploaded ${photoCount} photo${photoCount > 1 ? "s" : ""}`,
             "success"
           );
-          this.completedItems.push(this.selectedTask);
+          // this.completedItems.push(this.selectedTask);
           this.$refs.fileupload.value = "";
-          this.selectedTask = "";
+          // this.selectedTask = "";
           this.isSubmitting = false;
         }
       } else {
