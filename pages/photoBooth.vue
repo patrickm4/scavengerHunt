@@ -10,14 +10,14 @@
     <div class="mt-5">
       <p class="mt-6 text-xl leading-8 text-gray-700">
         Photo Booth photos ({{ generalPhotos?.length || 0 }})
+        <hr>
+        <p class="mt-2">
+          To download, tap the picture then tap the download icon in the top right corner.
+        </p>
       </p>
-      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-7" @click="isShowingGeneralPhotos = !isShowingGeneralPhotos">
-        {{ isShowingGeneralPhotos ? 'Hide' : 'Show'}}  general photos
-      </button>
-      <div v-if="!generalPhotos && isShowingGeneralPhotos">No general photos uploaded</div>
-      <div v-else-if="generalPhotos && isShowingGeneralPhotos">
+      <div v-if="!generalPhotos && isShowingGeneralPhotos">No photo booth pics uploaded</div>
+      <div v-else-if="generalPhotos">
         <div class="mb-2" v-for="photo in currentlyShowingGeneralPhotos">
-          <!-- TODO change fileb64String to something more appropriate -->
           <img :src="`https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${photo}`" @click="photoToInspect = {
             fileb64String: `https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${photo}`,
             href: `https://dopat-scavenger-hunt.s3.us-west-2.amazonaws.com/${photo}`
@@ -51,34 +51,25 @@ export default defineComponent({
         message: '',
         type: 'info',
       },
-      completedTasks: {},
       generalPhotos: [],
       currentlyShowingGeneralPhotos: [],// this will have at most 10 photos showing at a time, test with 5 at a time
       startPhotoIndex: 0,
       endPhotoIndex: 10,
       isShowingGeneralPhotos: false,
-      isShowingCompletedTasks: false,
       photoToInspect: null
     };
   },
   async mounted () {
-    const queryName = this.$route.query.fullName;
-    const name = localStorage.getItem("name");
-    const isAdvanced = localStorage.getItem("advanced");
-
-    if (name === queryName || isAdvanced) {
-      const response = await $fetch(
-        `/api/aws/user/s3?name=${encodeURIComponent(queryName)}`,
-        {
-          method: "GET",
-        }
-      );
-
-      this.completedTasks = response.completedTasks;
-      this.generalPhotos = response.general;
-      if (this.generalPhotos?.length > 0) {
-        this.currentlyShowingGeneralPhotos = this.generalPhotos.slice(0, 10);
+    const response = await $fetch(
+      `/api/aws/user/s3?name=${encodeURIComponent('Esther Young')}`,
+      {
+        method: "GET",
       }
+    );
+
+    this.generalPhotos = response.general;
+    if (this.generalPhotos?.length > 0) {
+      this.currentlyShowingGeneralPhotos = this.generalPhotos.slice(0, 10);
     }
   },
   methods: {
@@ -91,12 +82,6 @@ export default defineComponent({
       this.startPhotoIndex = this.startPhotoIndex - 10 < 0 ? 0 : this.startPhotoIndex - 10;
       this.endPhotoIndex = this.endPhotoIndex - 10 < 0 ? 10 : this.endPhotoIndex - 10;
       this.currentlyShowingGeneralPhotos = this.generalPhotos.slice(this.startPhotoIndex, this.endPhotoIndex);
-    },
-    hyphenToTitleCase(input: string): string {
-      return input
-        .split('-') // Split the string by hyphens
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Convert each word to Title Case
-        .join(' '); // Join the words back with spaces
     },
     showAlert(msg: string, type: string) {
       this.alert.message = msg

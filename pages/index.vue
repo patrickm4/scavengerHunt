@@ -48,16 +48,10 @@
     </div>
 
     <h1 class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">
-      Thank you everyone for playing the scavenger photo hunt at our wedding!
+      Thank you everyone for playing the scavenger photo hunt* and using the photo booth at our wedding!
     </h1>
 
-    <p class="mt-2 text-xl leading-8 text-gray-700">
-      For those looking for photo booth pictures, we'll try to have them up here
-      for download in the next couple of days.
-    </p>
-    <p class="mt-2 text-base leading-8 text-gray-700 float-right">
-      - Mr & Mrs Moreno
-    </p>
+    
 
     <!-- <template v-if="doesNeedsName">
       <p class="text-base font-semibold leading-7 text-yellow-900 mt-5">
@@ -167,13 +161,22 @@
 
       <p class="mt-4 text-xl leading-8 text-gray-700">Step 2:</p>  -->
 
-      <div class="mt-2">
+      <div class="mt-6">
+        <NuxtLink class="text-blue-500" :to="{ name: 'photoBooth' }"
+          >View photo booth pictures</NuxtLink
+        >
+      </div>
+
+      <div class="mt-6">
+        <p class="mt-2 text-xl leading-8 text-gray-700">
+          Have some pictures from the wedding? Upload them below!
+        </p>
         <!-- :multiple="selectedTask && selectedTask !== 'general' ? null : true" -->
         <input
           type="file"
-          class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100"
+          class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-200 file:text-red-600 hover:file:bg-violet-100 mt-3"
           ref="fileupload"
-          mulitple
+          multiple
           accept="image/*"
           @change="setPhoto($event)"
         />
@@ -197,7 +200,7 @@
               />
               <button
                 type="button"
-                class="mt-2 flex w-full justify-center rounded-md bg-red-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
+                class="mt-2 flex w-full justify-center rounded-md bg-gray-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
                 @click="deleteDraftPhoto(photo)"
               >
                 Remove
@@ -216,12 +219,27 @@
 
         <button
           type="button"
-          class="mt-2 flex w-full justify-center rounded-md bg-red-300 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
+          class="mt-8 flex w-full justify-center rounded-md bg-red-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm enabled:hover:bg-red-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-30 mb-8"
           @click="submit"
         >
           <div v-if="isSubmitting" class="circle mr-2 animate-spin"></div>
           Submit
         </button>
+
+        <hr>
+
+        
+        <p class="mt-5 text-base leading-8 text-gray-700">
+          <span class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">*</span> Winners to the photo hunt are:
+          <li>Genelie</li>
+          <li>Quinn</li>
+          <li>Justin Goldstein</li>
+          <p>We'll reach out to you guys when we can!</p>
+        </p>
+        <p class="mt-2 text-base leading-8 text-gray-700 float-right">
+          - Mr & Mrs Moreno
+        </p>
+
 
     <!-- <div>
           {{ seeResponse }}
