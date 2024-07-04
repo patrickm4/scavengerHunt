@@ -229,16 +229,16 @@
         <hr>
 
         
-        <p class="mt-5 text-base leading-8 text-gray-700">
+        <div class="mt-5 text-base leading-8 text-gray-700">
           <span class="mt-2 text-3xl font-bold tracking-tight text-red-300 sm:text-4xl">*</span> Winners to the photo hunt are:
           <li>Genelie</li>
           <li>Quinn</li>
           <li>Justin Goldstein</li>
-          <p>We'll reach out to you guys when we can!</p>
-        </p>
-        <p class="mt-2 text-base leading-8 text-gray-700 float-right">
+        </div>
+        <div>We'll reach out to you guys when we can!</div>
+        <div class="mt-2 text-base leading-8 text-gray-700 float-right">
           - Mr & Mrs Moreno
-        </p>
+        </div>
 
 
     <!-- <div>
