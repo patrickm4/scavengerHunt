@@ -226,6 +226,10 @@
           Submit
         </button>
 
+        <div v-if="storedPhotos?.length" class="mb-6">
+           You've uploaded a total of {{ storedPhotos.length }} photos.
+        </div>
+
         <hr>
 
         
@@ -297,9 +301,17 @@ export default defineComponent({
       selectedTask: "",
       isUserMenuOpen: false,
       allowLocalStorageMutate: false,
+      storedPhotos: [],
     };
   },
   async mounted() {
+    // get photodumps
+    let storedPhotos = localStorage.getItem("photoDumps");
+    if (storedPhotos) {
+      storedPhotos = JSON.parse(storedPhotos);
+      this.storedPhotos = storedPhotos;
+    }
+
     const name = localStorage.getItem("name");
     if (name) {
       this.fullName = name;
@@ -511,6 +523,21 @@ export default defineComponent({
           this.isSubmitting = false;
         } else {
           const photoCount = this.photos.length;
+          let storedPhotos = localStorage.getItem("photoDumps");
+
+          if (storedPhotos) {
+            storedPhotos = JSON.parse(storedPhotos);
+            storedPhotos.push(...this.photos.map((photo) => photo.name));
+            this.storedPhotos = storedPhotos;
+            localStorage.setItem("photoDumps", JSON.stringify(storedPhotos));
+          } else {
+            this.storedPhotos = this.photos.map((photo) => photo.name);
+            localStorage.setItem(
+              "photoDumps",
+              JSON.stringify(this.photos.map((photo) => photo.name))
+            );
+          }
+
           this.photos = [];
           this.showAlert(
             `Uploaded ${photoCount} photo${photoCount > 1 ? "s" : ""}`,
